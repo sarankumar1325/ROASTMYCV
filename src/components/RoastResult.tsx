@@ -16,8 +16,11 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Split result into sections by line breaks
-  const resultSections = result.split('\n\n').filter(Boolean);
+  // Split result into sections by line breaks, ensuring proper formatting
+  const resultSections = result
+    .split('\n\n')
+    .filter(Boolean)
+    .map(section => section.replace(/\*/g, '')); // Remove any asterisks
   
   const getTemperatureColor = (level: number) => {
     if (level < 30) return "text-yellow-400";
@@ -56,7 +59,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
             }}
           >
             <CardContent className="p-6">
-              <p>{section}</p>
+              <p className="whitespace-pre-line">{section}</p>
             </CardContent>
           </Card>
         ))}

@@ -1,6 +1,10 @@
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage } from "@langchain/core/messages";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Load the PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // API Key - in a real application, this should be stored securely
 const API_KEY = "AIzaSyC74WevNjWdIdIhdJ9iG_MCSZbEhBxjrtg";
@@ -15,7 +19,7 @@ const chatModel = new ChatGoogleGenerativeAI({
 
 export const roastResume = async (file: File): Promise<string> => {
   try {
-    // Extract text from PDF (in production, would use proper PDF parsing)
+    // Extract text from PDF
     const resumeText = await extractTextFromPDF(file);
     
     // Create a prompt for Gemini to roast the resume
@@ -30,7 +34,10 @@ export const roastResume = async (file: File): Promise<string> => {
     4. Rate the resume on a scale of 1-10 and explain your rating
     5. Provide 2-3 constructive suggestions for improvement
     
-    Be creative, funny, but also provide genuinely useful feedback. Here's the resume text:
+    Be creative and funny, but also provide genuinely useful feedback. 
+    Important: Do not use asterisks (*) for formatting - use line breaks and clear sections instead.
+    
+    Here's the resume text:
     
     ${resumeText}
     `;
@@ -47,44 +54,30 @@ export const roastResume = async (file: File): Promise<string> => {
   }
 };
 
-// Mock function to extract text from PDF
-// In a production app, this would use a proper PDF parsing library
+// Real function to extract text from PDF
 const extractTextFromPDF = async (file: File): Promise<string> => {
-  // This is a mock function that simulates extracting text from a PDF
-  // In a real application, you would use a library like pdf.js or a backend service
-  
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Return mock resume text for demonstration
-  return `
-  JOHN DOE
-  123 Main Street | Anytown, USA | (555) 123-4567 | john.doe@email.com
-  
-  PROFESSIONAL SUMMARY
-  Results-driven professional with a proven track record of success in fast-paced environments.
-  Team player with excellent communication skills who thinks outside the box.
-  
-  EXPERIENCE
-  Senior Manager | ABC Company | Jan 2020 - Present
-  • Spearheaded initiatives that increased revenue by 25%
-  • Managed a team of 10 professionals
-  • Leveraged synergies to optimize workflow processes
-  
-  Project Lead | XYZ Corporation | Mar 2017 - Dec 2019
-  • Utilized best practices to enhance customer satisfaction
-  • Implemented innovative solutions that reduced costs by 15%
-  • Collaborated with cross-functional teams to drive results
-  
-  EDUCATION
-  MBA, Business Administration | University of Somewhere | 2015
-  BS, Computer Science | College of Elsewhere | 2012
-  
-  SKILLS
-  • Microsoft Office Suite
-  • Leadership
-  • Communication
-  • Detail-oriented
-  • Problem-solving
-  `;
+  try {
+    // Convert the File to ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Load the PDF document
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    
+    let fullText = '';
+    
+    // Iterate through each page to extract text
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const textItems = textContent.items.map((item: any) => item.str).join(' ');
+      
+      fullText += textItems + '\n\n';
+    }
+    
+    console.log("Extracted PDF text:", fullText.substring(0, 100) + "...");
+    return fullText;
+  } catch (error) {
+    console.error("Error extracting PDF text:", error);
+    throw new Error("Failed to extract text from PDF");
+  }
 };
