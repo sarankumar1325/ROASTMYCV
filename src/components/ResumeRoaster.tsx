@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -16,25 +16,29 @@ const ResumeRoaster: React.FC = () => {
   const [roastLevel, setRoastLevel] = useState(0);
   const [roastResult, setRoastResult] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      
-      if (selectedFile.type !== 'application/pdf') {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload a PDF file",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setFile(selectedFile);
-      animateUpload();
+      validateAndSetFile(selectedFile);
     }
+  };
+  
+  const validateAndSetFile = (selectedFile: File) => {
+    if (selectedFile.type !== 'application/pdf') {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PDF file",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setFile(selectedFile);
+    animateUpload();
   };
 
   const animateUpload = async () => {
@@ -98,6 +102,33 @@ const ResumeRoaster: React.FC = () => {
     setRoastResult(null);
     setRoastLevel(0);
   };
+  
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      validateAndSetFile(e.dataTransfer.files[0]);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col h-full p-6">
@@ -105,9 +136,14 @@ const ResumeRoaster: React.FC = () => {
         <div className="flex flex-col items-center justify-center flex-1 gap-6">
           <div 
             className={`border-2 border-dashed rounded-lg p-10 w-full max-w-md text-center transition-all duration-300 ease-in-out ${
+              isDragging ? 'border-primary bg-primary/5' : 
               file ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-primary hover:bg-gray-50'
             }`}
             onClick={handleUploadClick}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
             <input
               type="file"
@@ -126,9 +162,11 @@ const ResumeRoaster: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Upload size={48} className="text-gray-400 hover-scale" />
+                  <Upload size={48} className={`${isDragging ? 'text-primary scale-110' : 'text-gray-400'} hover-scale transition-all duration-300`} />
                   <p className="font-medium">Upload your resume</p>
-                  <p className="text-sm text-gray-500">Click or drag & drop your PDF</p>
+                  <p className="text-sm text-gray-500">
+                    {isDragging ? "Drop your file here" : "Click or drag & drop your PDF"}
+                  </p>
                 </>
               )}
             </div>
