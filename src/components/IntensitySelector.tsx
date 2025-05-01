@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Thermometer, Flame, Fire, FireExtinguisher } from "lucide-react";
+import { Thermometer, Flame, FireExtinguisher } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IntensitySelectorProps {
