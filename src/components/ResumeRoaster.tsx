@@ -1,22 +1,25 @@
 
 import React, { useState, useRef, useCallback } from 'react';
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Upload, FileText, Thermometer } from "lucide-react";
 import RoastResult from "./RoastResult";
 import { roastResume } from "../services/resumeService";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import IntensitySelector from "./IntensitySelector";
 
 const ResumeRoaster: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isRoasting, setIsRoasting] = useState(false);
   const [roastLevel, setRoastLevel] = useState(0);
+  const [selectedIntensity, setSelectedIntensity] = useState<string>("");
   const [roastResult, setRoastResult] = useState<string | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showIntensitySelector, setShowIntensitySelector] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showRoastAnimation, setShowRoastAnimation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -51,16 +54,21 @@ const ResumeRoaster: React.FC = () => {
     }
     
     setIsUploading(false);
-    setIsRoasting(true);
-    
-    setTimeout(() => {
-      setIsRoasting(false);
-      setShowDialog(true);
-    }, 1500);
+    // Show intensity selector after upload completes
+    setShowIntensitySelector(true);
   };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleIntensitySelect = (intensity: string, level: number) => {
+    setSelectedIntensity(intensity);
+    setRoastLevel(level);
+    
+    // Hide intensity selector and start roasting process
+    setShowIntensitySelector(false);
+    setShowDialog(true);
   };
 
   const handleRoastResume = async () => {
@@ -70,25 +78,35 @@ const ResumeRoaster: React.FC = () => {
       setIsRoasting(true);
       setShowDialog(false);
       
-      // Simulate roasting progress
-      for (let i = 0; i <= 100; i += 5) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        setRoastLevel(i);
-      }
+      // Play the toast animation
+      setShowRoastAnimation(true);
       
-      const result = await roastResume(file);
-      setRoastResult(result);
+      // Wait for toast animation to complete before starting progress
+      setTimeout(async () => {
+        setShowRoastAnimation(false);
+        
+        // Simulate roasting progress
+        for (let i = 0; i <= 100; i += 5) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          setRoastLevel(i);
+        }
+        
+        const result = await roastResume(file);
+        setRoastResult(result);
+        
+        setTimeout(() => {
+          setIsRoasting(false);
+        }, 500);
+        
+        toast({
+          title: "Roasting complete",
+          description: "Your resume has been thoroughly roasted!",
+        });
+      }, 2000); // Time for animation to complete
       
-      setTimeout(() => {
-        setIsRoasting(false);
-      }, 500);
-      
-      toast({
-        title: "Roasting complete",
-        description: "Your resume has been thoroughly roasted!",
-      });
     } catch (error) {
       setIsRoasting(false);
+      setShowRoastAnimation(false);
       toast({
         title: "Roasting failed",
         description: "Failed to roast your resume. Please try again.",
@@ -101,6 +119,7 @@ const ResumeRoaster: React.FC = () => {
     setFile(null);
     setRoastResult(null);
     setRoastLevel(0);
+    setSelectedIntensity("");
   };
   
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -131,9 +150,30 @@ const ResumeRoaster: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 pt-20">
       {!roastResult ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-6">
+          {/* Toast animation */}
+          {showRoastAnimation && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+              <div className="relative">
+                <div className="animate-bounce bg-white rounded-lg p-4 shadow-lg">
+                  <FileText size={48} className="text-gray-700" />
+                </div>
+                <div 
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
+                  style={{
+                    animation: 'toaster-animation 2s forwards'
+                  }}
+                >
+                  <div className="bg-gradient-to-r from-amber-500 to-red-600 p-6 rounded-lg shadow-lg">
+                    <Thermometer size={32} className="text-white animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div 
             className={`border-2 border-dashed rounded-lg p-10 w-full max-w-md text-center transition-all duration-300 ease-in-out ${
               isDragging ? 'border-primary bg-primary/5' : 
@@ -190,19 +230,21 @@ const ResumeRoaster: React.FC = () => {
                 <Button 
                   onClick={resetForm} 
                   variant="outline" 
-                  className="flex-1"
+                  className="flex-1 group"
                   disabled={isUploading || isRoasting}
                 >
-                  Cancel
+                  <span className="group-hover:scale-105 transition-transform duration-200">Cancel</span>
                 </Button>
-                <Button 
-                  onClick={handleRoastResume} 
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 animate-enter"
-                  disabled={isUploading || isRoasting || !file}
-                >
-                  <Thermometer size={18} className="mr-2" />
-                  Roast It!
-                </Button>
+                
+                {selectedIntensity && !isRoasting && !isUploading && (
+                  <Button 
+                    onClick={handleRoastResume} 
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 animate-enter group"
+                  >
+                    <Thermometer size={18} className="mr-2 group-hover:rotate-12 transition-transform duration-200" />
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">Roast It!</span>
+                  </Button>
+                )}
               </div>
             </div>
           )}
@@ -211,31 +253,40 @@ const ResumeRoaster: React.FC = () => {
         <RoastResult result={roastResult} roastLevel={roastLevel} onReset={resetForm} />
       )}
 
+      {/* Confirmation Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Ready to roast your resume?</DialogTitle>
             <DialogDescription>
-              Our AI will analyze your resume and give you brutally honest feedback. Are you sure you want to continue?
+              Our AI will analyze your resume and give you brutally honest feedback with {selectedIntensity.toLowerCase()} intensity. Are you sure you want to continue?
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-3 mt-4">
             <Button 
               variant="outline" 
               onClick={() => setShowDialog(false)}
+              className="group"
             >
-              Cancel
+              <span className="group-hover:scale-105 transition-transform duration-200">Cancel</span>
             </Button>
             <Button 
               onClick={handleRoastResume}
-              className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700"
+              className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 group"
             >
-              <Thermometer size={18} className="mr-2" />
-              Roast It!
+              <Thermometer size={18} className="mr-2 group-hover:rotate-12 transition-transform duration-200" />
+              <span className="group-hover:translate-x-1 transition-transform duration-200">Roast It!</span>
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Intensity Selector */}
+      <IntensitySelector 
+        open={showIntensitySelector} 
+        onClose={() => setShowIntensitySelector(false)}
+        onSelectIntensity={handleIntensitySelect}
+      />
     </div>
   );
 };

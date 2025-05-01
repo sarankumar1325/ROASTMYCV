@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Thermometer, Share, Linkedin, Twitter, Facebook } from "lucide-react";
@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import InsightPanel from "./InsightPanel";
+import BadgeGenerator from "./BadgeGenerator";
 
 interface RoastResultProps {
   result: string;
@@ -16,10 +17,20 @@ interface RoastResultProps {
 
 const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }) => {
   const { toast } = useToast();
+  const resultRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Auto-scroll to the result
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Animate sections
+    const cards = document.querySelectorAll('.result-card');
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        (card as HTMLElement).style.opacity = '1';
+        (card as HTMLElement).style.transform = 'translateY(0)';
+      }, index * 150);
+    });
   }, []);
 
   // Split result into sections by line breaks, ensuring proper formatting
@@ -66,7 +77,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
   };
   
   return (
-    <div className="flex flex-col animate-fade-in gap-6">
+    <div ref={resultRef} className="flex flex-col animate-fade-in gap-6 pt-20">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Resume Roast Results</h2>
         <div className="flex gap-2">
@@ -106,7 +117,13 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
               </div>
             </PopoverContent>
           </Popover>
-          <Button onClick={onReset} variant="outline">Upload Another</Button>
+          <Button 
+            onClick={onReset} 
+            variant="outline"
+            className="group transition-all duration-300"
+          >
+            <span className="group-hover:translate-x-1 transition-transform duration-300">Upload Another</span>
+          </Button>
         </div>
       </div>
       
@@ -142,11 +159,11 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
             {resultSections.map((section, index) => (
               <Card 
                 key={index} 
-                className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
+                className="result-card overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
                 style={{
-                  animationDelay: `${index * 150}ms`,
                   opacity: 0,
-                  animation: "fade-in 0.5s ease-out forwards"
+                  transform: 'translateY(20px)',
+                  transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
                 }}
               >
                 <CardContent className="p-6">
@@ -156,8 +173,9 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
             ))}
           </div>
         </div>
-        <div>
+        <div className="space-y-6">
           <InsightPanel roastLevel={roastLevel} result={result} />
+          <BadgeGenerator roastLevel={roastLevel} result={result} />
         </div>
       </div>
     </div>
