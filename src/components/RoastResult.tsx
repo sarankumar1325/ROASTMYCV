@@ -47,37 +47,117 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     };
   }, []);
 
-  // Split result into sections and format them
+  // Improved function to split and format results
   const formatResults = () => {
     if (!result) return [];
     
-    // Split by double newlines to separate major sections
-    const rawSections = result
-      .split('\n\n')
-      .filter(Boolean)
-      .map(section => section.replace(/\*/g, ''));
+    // Define section markers to identify different parts of the roast
+    const sectionMarkers = [
+      { title: 'Overall Impression', keywords: ['overall impression', 'first impression'], icon: 'Thermometer' },
+      { title: 'Top Weaknesses', keywords: ['top 3 weaknesses', 'weaknesses', 'weakness'], icon: 'AlertTriangle' },
+      { title: 'Clichés & Overused Phrases', keywords: ['cliché', 'overused', 'phrases'], icon: 'Copy' },
+      { title: 'Rating', keywords: ['rating', 'rate', 'score'], icon: 'Award' },
+      { title: 'Improvement Suggestions', keywords: ['suggest', 'improve', 'constructive'], icon: 'CheckCircle' },
+      { title: 'Profile Tone', keywords: ['tone', 'voice', 'profile'], icon: 'Award' },
+      { title: 'Achievement Clarity', keywords: ['achievement', 'accomplishment'], icon: 'Award' },
+    ];
     
-    // Generate titled sections based on content patterns
-    const sections = [];
+    // First, try to identify sections using headings or strong patterns
+    const lines = result.split('\n');
+    const sections: {title: string; content: string; icon: string}[] = [];
+    let currentSection: {title: string; content: string; icon: string} | null = null;
     
-    // Try to identify section types based on content
-    for (const text of rawSections) {
-      if (text.toLowerCase().includes('overall impression') || text.toLowerCase().includes('first impression')) {
-        sections.push({ title: 'Overall Impression', content: text, icon: 'Thermometer' });
-      } else if (text.toLowerCase().includes('weakness') || text.toLowerCase().includes('weaknesses')) {
-        sections.push({ title: 'Top Weaknesses', content: text, icon: 'AlertTriangle' });
-      } else if (text.toLowerCase().includes('cliché') || text.toLowerCase().includes('overused')) {
-        sections.push({ title: 'Clichés & Overused Phrases', content: text, icon: 'Copy' });
-      } else if (text.toLowerCase().includes('rating') || text.toLowerCase().includes('rate')) {
-        sections.push({ title: 'Rating', content: text, icon: 'Award' });
-      } else if (text.toLowerCase().includes('suggest') || text.toLowerCase().includes('improve')) {
-        sections.push({ title: 'Improvement Suggestions', content: text, icon: 'CheckCircle' });
-      } else if (text.toLowerCase().includes('tone') || text.toLowerCase().includes('voice')) {
-        sections.push({ title: 'Profile Tone', content: text, icon: 'Award' });
-      } else if (text.toLowerCase().includes('achievement') || text.toLowerCase().includes('accomplishment')) {
-        sections.push({ title: 'Achievement Clarity', content: text, icon: 'Award' });
+    // Process line by line to identify sections
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Skip empty lines
+      if (!line) continue;
+      
+      // Check if this line is a section header
+      const isSectionHeader = 
+        (line.endsWith(':') && line.length < 50) || 
+        (i > 0 && lines[i-1].trim() === '' && line.length < 50 && !line.startsWith('•') && !line.startsWith('-') && !line.match(/^\d+\./));
+      
+      if (isSectionHeader) {
+        // Save previous section if exists
+        if (currentSection && currentSection.content.trim()) {
+          sections.push(currentSection);
+        }
+        
+        // Try to match with predefined sections
+        let matchedSection = false;
+        for (const marker of sectionMarkers) {
+          if (marker.keywords.some(keyword => line.toLowerCase().includes(keyword))) {
+            currentSection = { 
+              title: marker.title, 
+              content: line + '\n\n', 
+              icon: marker.icon 
+            };
+            matchedSection = true;
+            break;
+          }
+        }
+        
+        // If no match found, create a custom section
+        if (!matchedSection) {
+          const title = line.endsWith(':') ? line.slice(0, -1) : line;
+          currentSection = { 
+            title, 
+            content: line + '\n\n', 
+            icon: 'Award'  // Default icon
+          };
+        }
+      } else if (currentSection) {
+        // Add to current section content
+        currentSection.content += line + '\n';
       } else {
-        sections.push({ title: 'Analysis', content: text, icon: 'Award' });
+        // If no current section, start with intro section
+        currentSection = { 
+          title: 'Introduction', 
+          content: line + '\n', 
+          icon: 'Thermometer' 
+        };
+      }
+    }
+    
+    // Add the last section if it exists
+    if (currentSection && currentSection.content.trim()) {
+      sections.push(currentSection);
+    }
+    
+    // If we couldn't identify sections properly, fall back to simpler approach
+    if (sections.length <= 1) {
+      // Split by double newlines to separate major sections
+      const rawSections = result
+        .split('\n\n')
+        .filter(Boolean);
+      
+      // Clear sections array
+      sections.length = 0;
+      
+      // Try to identify section types based on content
+      for (const text of rawSections) {
+        let matched = false;
+        for (const marker of sectionMarkers) {
+          if (marker.keywords.some(keyword => text.toLowerCase().includes(keyword))) {
+            sections.push({ 
+              title: marker.title, 
+              content: text, 
+              icon: marker.icon 
+            });
+            matched = true;
+            break;
+          }
+        }
+        
+        if (!matched) {
+          sections.push({ 
+            title: 'Analysis', 
+            content: text, 
+            icon: 'Award' 
+          });
+        }
       }
     }
     
@@ -138,6 +218,53 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
       default:
         return <Award size={18} />;
     }
+  };
+  
+  // Format the content to properly display lists and numbered items
+  const formatContent = (content: string) => {
+    // Process numbered lists and bullet points
+    const lines = content.split('\n');
+    let inList = false;
+    let formattedContent = '';
+    
+    lines.forEach((line, index) => {
+      // Check for numbered list items (e.g., "1." or "1)")
+      const numberedMatch = line.match(/^\s*(\d+[\.\)])\s*/);
+      // Check for bullet points
+      const bulletMatch = line.match(/^\s*[\•\-]\s*/);
+      
+      if (numberedMatch || bulletMatch) {
+        if (!inList) {
+          // Start a new list
+          formattedContent += '<ul class="list-disc pl-5 space-y-1">\n';
+          inList = true;
+        }
+        
+        // Add list item
+        formattedContent += `<li class="mb-1">${line.replace(/^\s*(\d+[\.\)]|\•|\-)\s*/, '')}</li>\n`;
+      } else {
+        // End list if we were in one
+        if (inList) {
+          formattedContent += '</ul>\n';
+          inList = false;
+        }
+        
+        // Add regular paragraph with spacing
+        if (line.trim()) {
+          formattedContent += `<p class="mb-2">${line}</p>\n`;
+        } else if (index > 0 && lines[index - 1].trim()) {
+          // Add spacing between paragraphs
+          formattedContent += '<br />\n';
+        }
+      }
+    });
+    
+    // Close any open list
+    if (inList) {
+      formattedContent += '</ul>\n';
+    }
+    
+    return formattedContent;
   };
   
   return (
@@ -249,7 +376,10 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <p className="whitespace-pre-line leading-relaxed text-base">{section.content}</p>
+              <div 
+                className="leading-relaxed text-base"
+                dangerouslySetInnerHTML={{ __html: formatContent(section.content) }}
+              />
             </CardContent>
           </Card>
         ))}
