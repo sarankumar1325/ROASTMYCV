@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Thermometer, Share, Share2, Copy, Download } from "lucide-react";
+import { Thermometer, Share2, Copy, Download, Award, AlertTriangle, CheckCircle } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
@@ -63,17 +63,21 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     // Try to identify section types based on content
     for (const text of rawSections) {
       if (text.toLowerCase().includes('overall impression') || text.toLowerCase().includes('first impression')) {
-        sections.push({ title: 'Overall Impression', content: text });
+        sections.push({ title: 'Overall Impression', content: text, icon: 'Thermometer' });
       } else if (text.toLowerCase().includes('weakness') || text.toLowerCase().includes('weaknesses')) {
-        sections.push({ title: 'Top Weaknesses', content: text });
+        sections.push({ title: 'Top Weaknesses', content: text, icon: 'AlertTriangle' });
       } else if (text.toLowerCase().includes('cliché') || text.toLowerCase().includes('overused')) {
-        sections.push({ title: 'Overused Phrases', content: text });
+        sections.push({ title: 'Clichés & Overused Phrases', content: text, icon: 'Copy' });
       } else if (text.toLowerCase().includes('rating') || text.toLowerCase().includes('rate')) {
-        sections.push({ title: 'Rating', content: text });
+        sections.push({ title: 'Rating', content: text, icon: 'Award' });
       } else if (text.toLowerCase().includes('suggest') || text.toLowerCase().includes('improve')) {
-        sections.push({ title: 'Improvement Suggestions', content: text });
+        sections.push({ title: 'Improvement Suggestions', content: text, icon: 'CheckCircle' });
+      } else if (text.toLowerCase().includes('tone') || text.toLowerCase().includes('voice')) {
+        sections.push({ title: 'Profile Tone', content: text, icon: 'Award' });
+      } else if (text.toLowerCase().includes('achievement') || text.toLowerCase().includes('accomplishment')) {
+        sections.push({ title: 'Achievement Clarity', content: text, icon: 'Award' });
       } else {
-        sections.push({ title: 'Analysis', content: text });
+        sections.push({ title: 'Analysis', content: text, icon: 'Award' });
       }
     }
     
@@ -116,6 +120,23 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
           description: "Share link has been copied to clipboard",
         });
       });
+    }
+  };
+  
+  const getIconForSection = (iconName: string) => {
+    switch (iconName) {
+      case 'Thermometer':
+        return <Thermometer size={18} />;
+      case 'AlertTriangle':
+        return <AlertTriangle size={18} />;
+      case 'Copy':
+        return <Copy size={18} />;
+      case 'Award':
+        return <Award size={18} />;
+      case 'CheckCircle':
+        return <CheckCircle size={18} />;
+      default:
+        return <Award size={18} />;
     }
   };
   
@@ -208,8 +229,8 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
         <InsightPanel roastLevel={roastLevel} result={result} />
       </div>
       
-      {/* Roast results in cards */}
-      <div className="space-y-6">
+      {/* Roast results in cards - responsive grid layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {resultSections.map((section, index) => (
           <Card 
             key={index} 
@@ -221,19 +242,14 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
               transitionDelay: `${index * 100}ms`
             }}
           >
-            <CardHeader className="border-b bg-gray-50 py-4">
-              <CardTitle className="text-lg uppercase tracking-wide text-gray-700 flex items-center gap-2">
-                {section.title === 'Overall Impression' && <Thermometer size={18} />}
-                {section.title === 'Top Weaknesses' && (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                )}
+            <CardHeader className="border-b bg-gray-50 py-3 px-4">
+              <CardTitle className="text-sm uppercase tracking-wide text-gray-700 flex items-center gap-2">
+                {getIconForSection(section.icon)}
                 {section.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <p className="whitespace-pre-line leading-relaxed">{section.content}</p>
+            <CardContent className="p-4">
+              <p className="whitespace-pre-line leading-relaxed text-base">{section.content}</p>
             </CardContent>
           </Card>
         ))}

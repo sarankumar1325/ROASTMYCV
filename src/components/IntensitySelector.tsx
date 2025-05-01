@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Thermometer, Flame, FireExtinguisher } from "lucide-react";
+import { Thermometer, Flame, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IntensitySelectorProps {
@@ -41,7 +41,7 @@ const IntensitySelector: React.FC<IntensitySelectorProps> = ({
               className="w-full h-24 flex flex-col items-center justify-center transition-all duration-300 hover:border-yellow-300 group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-yellow-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <FireExtinguisher 
+              <FileText 
                 size={36} 
                 className="text-yellow-500 group-hover:scale-110 transition-transform duration-300 relative z-10" 
               />
