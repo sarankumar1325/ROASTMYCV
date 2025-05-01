@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-const PricingPage: React.FC = () => {
+const Pricing: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <NavBar />
