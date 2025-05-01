@@ -191,7 +191,8 @@ const BadgeGenerator: React.FC<BadgeGeneratorProps> = ({ roastLevel, result }) =
       </CardContent>
       
       {/* Add CSS for animations */}
-      <style jsx>{`
+      <style>
+        {`
         @keyframes stamp {
           0% { transform: translateY(-50px); opacity: 0; }
           60% { transform: translateY(10px); opacity: 1; }
@@ -211,7 +212,8 @@ const BadgeGenerator: React.FC<BadgeGeneratorProps> = ({ roastLevel, result }) =
         .animate-shimmer {
           animation: shimmer 2s infinite;
         }
-      `}</style>
+        `}
+      </style>
     </Card>
   );
 };
