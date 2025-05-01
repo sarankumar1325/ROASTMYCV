@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Thermometer, Share, Linkedin, Twitter, Facebook } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import InsightPanel from "./InsightPanel";
 
 interface RoastResultProps {
@@ -15,6 +15,8 @@ interface RoastResultProps {
 }
 
 const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }) => {
+  const { toast } = useToast();
+  
   useEffect(() => {
     // Auto-scroll to the result
     window.scrollTo({ top: 0, behavior: 'smooth' });
