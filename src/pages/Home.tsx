@@ -1,0 +1,449 @@
+
+import React, { useEffect, useRef } from 'react';
+import NavBar from '../components/NavBar';
+import Logo from '../components/Logo';
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight, Check } from 'lucide-react';
+
+const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const demoRef = useRef<HTMLDivElement>(null);
+  const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const ctaButtonRef = useRef<HTMLButtonElement>(null);
+  const demoStepRef = useRef(1);
+  const demoIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Observer for features animation on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    // Apply observer to feature elements
+    featureRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+    
+    // Demo animation
+    const runDemoAnimation = () => {
+      if (!demoRef.current) return;
+      const step = demoStepRef.current;
+      
+      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+      demoSteps.forEach((el) => el.classList.remove('active'));
+      
+      if (demoSteps[step - 1]) {
+        demoSteps[step - 1].classList.add('active');
+      }
+      
+      demoStepRef.current = step < 3 ? step + 1 : 1;
+    };
+    
+    // Start demo animation
+    runDemoAnimation();
+    demoIntervalRef.current = setInterval(runDemoAnimation, 4000);
+    
+    // Button pulse animation
+    if (ctaButtonRef.current) {
+      const pulseAnimation = () => {
+        ctaButtonRef.current?.classList.add('animate-pulse-glow');
+        setTimeout(() => {
+          ctaButtonRef.current?.classList.remove('animate-pulse-glow');
+        }, 1000);
+      };
+      
+      const pulseInterval = setInterval(pulseAnimation, 6000);
+      return () => {
+        clearInterval(pulseInterval);
+        if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+        observer.disconnect();
+      };
+    }
+    
+    return () => {
+      if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+      observer.disconnect();
+    };
+  }, []);
+  
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <NavBar />
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="min-h-[90vh] flex items-center justify-center relative overflow-hidden"
+          style={{
+            background: "radial-gradient(circle at center, #fff2e6, #ffffff)"
+          }}>
+          <div className="absolute inset-0 z-0 opacity-20">
+            <div className="absolute top-1/4 left-1/5 w-64 h-64 rounded-full bg-gradient-to-r from-amber-300 to-amber-100 blur-3xl"></div>
+            <div className="absolute bottom-1/4 right-1/5 w-64 h-64 rounded-full bg-gradient-to-r from-red-300 to-amber-100 blur-3xl"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <div className="mb-6 transform hover:scale-110 transition-transform duration-300">
+              <Logo variant="default" showText={false} className="mx-auto" />
+            </div>
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">
+              Give Your Resume the <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-red-600">Roast</span> It Deserves
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10">
+              Upload. Pick Your Heat. Get Sizzled Feedback.
+            </p>
+            <Button 
+              onClick={() => navigate('/roaster')}
+              ref={ctaButtonRef}
+              className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
+            >
+              <span className="mr-2 group-hover:translate-x-1 transition-transform duration-200">Try Now</span>
+              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
+            </Button>
+          </div>
+          
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </div>
+        </section>
+        
+        {/* Demo Carousel */}
+        <section className="py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+            
+            <div 
+              ref={demoRef}
+              className="max-w-3xl mx-auto h-72 relative overflow-hidden rounded-lg shadow-lg border"
+            >
+              {/* Demo Step 1 */}
+              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex items-center justify-center space-x-6">
+                  <div className="w-24 h-32 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center relative animate-slide-in">
+                    <div className="absolute inset-2 border border-gray-400 bg-white">
+                      <div className="h-2 w-12 bg-gray-400 mx-auto mt-2"></div>
+                      <div className="h-1 w-14 bg-gray-300 mx-auto mt-2"></div>
+                      <div className="h-1 w-10 bg-gray-300 mx-auto mt-1"></div>
+                      <div className="h-1 w-12 bg-gray-300 mx-auto mt-1"></div>
+                    </div>
+                  </div>
+                  <div className="text-xl font-medium">Upload your resume</div>
+                </div>
+              </div>
+              
+              {/* Demo Step 2 */}
+              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex items-center justify-center space-x-6">
+                  <div className="relative">
+                    <div className="w-20 h-24 bg-gradient-to-r from-amber-500 to-red-600 rounded-lg flex items-center justify-center">
+                      <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-16 h-3 bg-gray-800 rounded-t-lg"></div>
+                      <div className="w-14 h-20 bg-gray-100 animate-toaster-paper"></div>
+                    </div>
+                  </div>
+                  <div className="text-xl font-medium">Select your roast intensity</div>
+                </div>
+              </div>
+              
+              {/* Demo Step 3 */}
+              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex items-center justify-center space-x-6">
+                  <div className="w-36 h-24 border-2 border-gray-200 rounded-lg bg-white p-2 shadow-md animate-fade-in">
+                    <div className="h-2 w-20 bg-gradient-to-r from-amber-500 to-red-600 rounded mb-2"></div>
+                    <div className="h-1 w-full bg-gray-200 rounded mb-1"></div>
+                    <div className="h-1 w-4/5 bg-gray-200 rounded mb-1"></div>
+                    <div className="h-1 w-3/5 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="text-xl font-medium">Get your honest roast feedback</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center mt-8 space-x-2">
+              <button 
+                onClick={() => {
+                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+                  demoStepRef.current = 1;
+                  demoIntervalRef.current = setInterval(() => {
+                    const step = demoStepRef.current;
+                    if (demoRef.current) {
+                      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                      demoSteps.forEach((el) => el.classList.remove('active'));
+                      if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
+                    }
+                    demoStepRef.current = step < 3 ? step + 1 : 1;
+                  }, 4000);
+                  if (demoRef.current) {
+                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                    demoSteps.forEach((el) => el.classList.remove('active'));
+                    if (demoSteps[0]) demoSteps[0].classList.add('active');
+                  }
+                }}
+                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
+              ></button>
+              <button 
+                onClick={() => {
+                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+                  demoStepRef.current = 2;
+                  demoIntervalRef.current = setInterval(() => {
+                    const step = demoStepRef.current;
+                    if (demoRef.current) {
+                      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                      demoSteps.forEach((el) => el.classList.remove('active'));
+                      if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
+                    }
+                    demoStepRef.current = step < 3 ? step + 1 : 1;
+                  }, 4000);
+                  if (demoRef.current) {
+                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                    demoSteps.forEach((el) => el.classList.remove('active'));
+                    if (demoSteps[1]) demoSteps[1].classList.add('active');
+                  }
+                }}
+                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
+              ></button>
+              <button 
+                onClick={() => {
+                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+                  demoStepRef.current = 3;
+                  demoIntervalRef.current = setInterval(() => {
+                    const step = demoStepRef.current;
+                    if (demoRef.current) {
+                      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                      demoSteps.forEach((el) => el.classList.remove('active'));
+                      if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
+                    }
+                    demoStepRef.current = step < 3 ? step + 1 : 1;
+                  }, 4000);
+                  if (demoRef.current) {
+                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                    demoSteps.forEach((el) => el.classList.remove('active'));
+                    if (demoSteps[2]) demoSteps[2].classList.add('active');
+                  }
+                }}
+                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
+              ></button>
+            </div>
+          </div>
+        </section>
+        
+        {/* Features Section */}
+        <section className="py-24">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Features & Benefits</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <div 
+                ref={(el) => featureRefs.current[0] = el}
+                className="bg-white p-6 rounded-lg shadow-md transform translate-y-10 opacity-0 transition-all duration-700"
+              >
+                <div className="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                  <div className="bg-gradient-to-r from-amber-500 to-red-600 w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19.071 13.142L13.414 18.8a2 2 0 0 1-2.828 0l-5.657-5.657a6 6 0 0 1 0-8.485 5.998 5.998 0 0 1 8.485 0l.707.707.707-.707a5.998 5.998 0 0 1 8.485 0 6 6 0 0 1 0 8.485z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase tracking-wide">Choose Your Heat</h3>
+                <p className="text-gray-600">Select Mild, Medium, or Savage intensity before roasting. Control exactly how brutally honest you want your feedback to be.</p>
+              </div>
+              
+              {/* Feature 2 */}
+              <div 
+                ref={(el) => featureRefs.current[1] = el}
+                className="bg-white p-6 rounded-lg shadow-md transform translate-y-10 opacity-0 transition-all duration-700 delay-100"
+              >
+                <div className="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                  <div className="bg-gradient-to-r from-amber-500 to-red-600 w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20h9"/>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase tracking-wide">Witty, Actionable Roasts</h3>
+                <p className="text-gray-600">Get top-3 weaknesses with real "so what?" follow-ups. AI-powered analysis identifies clichés and offers constructive improvement suggestions.</p>
+              </div>
+              
+              {/* Feature 3 */}
+              <div 
+                ref={(el) => featureRefs.current[2] = el}
+                className="bg-white p-6 rounded-lg shadow-md transform translate-y-10 opacity-0 transition-all duration-700 delay-200"
+              >
+                <div className="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                  <div className="bg-gradient-to-r from-amber-500 to-red-600 w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase tracking-wide">Shiny Badge Export</h3>
+                <p className="text-gray-600">Generate a glittery, animated badge with your roast level & custom tagline. Share your achievement and spread the word about your resume roasting journey.</p>
+              </div>
+            </div>
+            
+            <div className="text-center mt-16">
+              <Button 
+                onClick={() => navigate('/roaster')} 
+                ref={ctaButtonRef}
+                className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-6 py-3 text-lg rounded-lg shadow-lg group"
+              >
+                <span className="mr-2">🔥 Ready to Get Roasted? Try Now</span>
+                <ChevronRight size={20} className="inline-block group-hover:translate-x-1 transition-transform duration-200" />
+              </Button>
+            </div>
+          </div>
+        </section>
+        
+        {/* Testimonials section */}
+        <section className="py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">What People Are Saying</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  name: "Sarah J.",
+                  role: "UX Designer",
+                  comment: "Got my resume roasted at 'Savage' level and landed 3 interviews the next week. Brutal but effective!"
+                },
+                {
+                  name: "Alex T.",
+                  role: "Software Engineer",
+                  comment: "The AI caught buzzword overload I didn't even notice. My resume is now half the length but twice as impactful."
+                },
+                {
+                  name: "Miguel R.",
+                  role: "Marketing Specialist",
+                  comment: "Downloaded my 'Medium Heat Veteran' badge and used it in my portfolio. Conversation starter in every interview!"
+                }
+              ].map((testimonial, index) => (
+                <div 
+                  key={index}
+                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-start mb-4">
+                    <div className="flex-shrink-0">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                    <div className="flex-shrink-0 ml-1">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                    <div className="flex-shrink-0 ml-1">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                    <div className="flex-shrink-0 ml-1">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                    <div className="flex-shrink-0 ml-1">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 mb-4">"{testimonial.comment}"</p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-red-600 flex items-center justify-center text-white font-bold">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-medium">{testimonial.name}</h4>
+                      <p className="text-sm text-gray-500">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="border-t py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-6 md:mb-0">
+              <Logo variant="default" showText={true} className="h-8" />
+              <p className="text-sm text-muted-foreground mt-2">Give your resume the critique it deserves.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div>
+                <h3 className="font-medium mb-2">Product</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Features</a></li>
+                  <li><a href="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Pricing</a></li>
+                  <li><a href="/roaster" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Try It</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium mb-2">Resources</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Blog</a></li>
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Guides</a></li>
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Support</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium mb-2">Company</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">About</a></li>
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Careers</a></li>
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Contact</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium mb-2">Legal</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Privacy</a></li>
+                  <li><a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors hover-bounce">Terms</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-sm text-muted-foreground">© 2025 Resume Roaster. All rights reserved.</p>
+            <div className="flex space-x-4 mt-4 md:mt-0">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                </svg>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default Home;
