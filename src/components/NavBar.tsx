@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, User, FileText, DollarSign, Menu, X } from "lucide-react";
+import Logo from './Logo';
 
 const NavBar: React.FC = () => {
   const location = useLocation();
@@ -40,8 +41,7 @@ const NavBar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <FileText size={24} className="text-red-600 mr-2" />
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-red-600 bg-clip-text text-transparent">Resume Roaster</span>
+              <Logo variant="default" showText={true} />
             </Link>
           </div>
           
