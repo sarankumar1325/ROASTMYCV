@@ -35,7 +35,11 @@ export const roastResume = async (file: File): Promise<string> => {
     5. Provide 2-3 constructive suggestions for improvement
     
     Be creative and funny, but also provide genuinely useful feedback. 
-    Important: Do not use asterisks (*) for formatting - use line breaks and clear sections instead.
+    Important: 
+    - Do not use asterisks (*) or other markdown formatting - use plain text only
+    - Use line breaks and clear section headers to organize your response
+    - Keep your formatting clean and consistent
+    - Avoid excessive blank lines at the end of your response
     
     Here's the resume text:
     

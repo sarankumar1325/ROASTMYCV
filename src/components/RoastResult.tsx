@@ -47,9 +47,28 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     };
   }, []);
 
+  // Clean the markdown formatting from the result text
+  const cleanFormattedText = (text: string): string => {
+    if (!text) return '';
+    
+    // Remove markdown formatting (asterisks)
+    let cleanedText = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+    cleanedText = cleanedText.replace(/\*([^*]+)\*/g, '$1');
+    
+    // Remove consecutive blank lines (more than 2 newlines)
+    cleanedText = cleanedText.replace(/\n{3,}/g, '\n\n');
+    
+    // Trim trailing whitespace at the end
+    cleanedText = cleanedText.trim();
+    
+    return cleanedText;
+  };
+
   // Improved function to split and format results
   const formatResults = () => {
     if (!result) return [];
+    
+    const cleanResult = cleanFormattedText(result);
     
     // Define section markers to identify different parts of the roast
     const sectionMarkers = [
@@ -63,7 +82,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     ];
     
     // First, try to identify sections using headings or strong patterns
-    const lines = result.split('\n');
+    const lines = cleanResult.split('\n');
     const sections: {title: string; content: string; icon: string}[] = [];
     let currentSection: {title: string; content: string; icon: string} | null = null;
     
@@ -129,7 +148,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
     // If we couldn't identify sections properly, fall back to simpler approach
     if (sections.length <= 1) {
       // Split by double newlines to separate major sections
-      const rawSections = result
+      const rawSections = cleanResult
         .split('\n\n')
         .filter(Boolean);
       
@@ -165,6 +184,9 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
   };
   
   const resultSections = formatResults();
+  
+  // Clean the displayed result text
+  const displayedResult = cleanFormattedText(result);
   
   const getTemperatureColor = (level: number) => {
     if (level < 30) return "text-yellow-400";
@@ -222,8 +244,11 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
   
   // Format the content to properly display lists and numbered items
   const formatContent = (content: string) => {
+    // Clean any markdown first
+    const cleanedContent = cleanFormattedText(content);
+    
     // Process numbered lists and bullet points
-    const lines = content.split('\n');
+    const lines = cleanedContent.split('\n');
     let inList = false;
     let formattedContent = '';
     
@@ -330,7 +355,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
           <FileText size={20} className="text-white" />
         </CardHeader>
         <CardContent className="p-6 whitespace-pre-wrap prose max-w-none">
-          {result}
+          {displayedResult}
         </CardContent>
       </Card>
       
