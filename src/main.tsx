@@ -5,8 +5,8 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import App from './App.tsx';
 import './index.css';
 
-// Import your Publishable Key
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// Use the provided Publishable Key
+const PUBLISHABLE_KEY = "pk_test_cm9tYW50aWMtZG9yeS03MC5jbGVyay5hY2NvdW50cy5kZXYk";
 
 if (!PUBLISHABLE_KEY) {
   // Create a friendly error message element
