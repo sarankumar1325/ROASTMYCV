@@ -5,6 +5,7 @@ import Logo from '../components/Logo';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Check } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -197,6 +198,7 @@ const Home: React.FC = () => {
           .demo-step {
             opacity: 0;
             transform: translateX(100%);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
           }
           
           .demo-step.active {
@@ -237,14 +239,27 @@ const Home: React.FC = () => {
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10">
               Upload. Pick Your Heat. Get Sizzled Feedback.
             </p>
-            <Button 
-              onClick={() => navigate('/roaster')}
-              ref={ctaButtonRef}
-              className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
-            >
-              <span className="mr-2 group-hover:translate-x-1 transition-transform duration-200">Try Now</span>
-              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
-            </Button>
+            <SignedIn>
+              <Button 
+                onClick={() => navigate('/roaster')}
+                ref={ctaButtonRef}
+                className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
+              >
+                <span className="mr-2 group-hover:translate-x-1 transition-transform duration-200">Try Now</span>
+                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
+              </Button>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button 
+                  ref={ctaButtonRef}
+                  className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
+                >
+                  <span className="mr-2 group-hover:translate-x-1 transition-transform duration-200">Get Started</span>
+                  <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
+                </Button>
+              </SignInButton>
+            </SignedOut>
           </div>
           
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
@@ -270,7 +285,7 @@ const Home: React.FC = () => {
               className="max-w-4xl mx-auto h-96 relative overflow-hidden rounded-xl shadow-2xl border border-gray-100 bg-white"
             >
               {/* Demo Step 1 */}
-              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center p-8">
                 <div className="flex flex-col items-center justify-center space-y-8">
                   <div className="relative">
                     <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">1</div>
@@ -298,7 +313,7 @@ const Home: React.FC = () => {
               </div>
               
               {/* Demo Step 2 */}
-              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-amber-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-amber-50 flex items-center justify-center p-8">
                 <div className="flex flex-col items-center justify-center space-y-8">
                   <div className="relative">
                     <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">2</div>
@@ -335,7 +350,7 @@ const Home: React.FC = () => {
               </div>
               
               {/* Demo Step 3 */}
-              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-red-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-red-50 flex items-center justify-center p-8">
                 <div className="flex flex-col items-center justify-center space-y-8">
                   <div className="relative">
                     <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">3</div>
@@ -466,14 +481,26 @@ const Home: React.FC = () => {
             </div>
             
             <div className="text-center mt-16">
-              <Button 
-                onClick={() => navigate('/roaster')} 
-                ref={ctaButtonRef}
-                className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-6 py-3 text-lg rounded-lg shadow-lg group"
-              >
-                <span className="mr-2">🔥 Ready to Get Roasted? Try Now</span>
-                <ChevronRight size={20} className="inline-block group-hover:translate-x-1 transition-transform duration-200" />
-              </Button>
+              <SignedIn>
+                <Button 
+                  onClick={() => navigate('/roaster')} 
+                  ref={ctaButtonRef}
+                  className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-6 py-3 text-lg rounded-lg shadow-lg group"
+                >
+                  <span className="mr-2">🔥 Ready to Get Roasted? Try Now</span>
+                  <ChevronRight size={20} className="inline-block group-hover:translate-x-1 transition-transform duration-200" />
+                </Button>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button 
+                    className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 px-6 py-3 text-lg rounded-lg shadow-lg group"
+                  >
+                    <span className="mr-2">🔥 Ready to Get Roasted? Sign In</span>
+                    <ChevronRight size={20} className="inline-block group-hover:translate-x-1 transition-transform duration-200" />
+                  </Button>
+                </SignInButton>
+              </SignedOut>
             </div>
           </div>
         </section>
