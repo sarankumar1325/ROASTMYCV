@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import NavBar from '../components/NavBar';
 import Logo from '../components/Logo';
@@ -73,6 +74,147 @@ const Home: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Add CSS for animations */}
+      <div dangerouslySetInnerHTML={{ __html: `
+        <style>
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          @keyframes rotate-slow {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+          }
+          @keyframes pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+          }
+          @keyframes upload-appear {
+            0% { transform: translate(-50%, 20px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+          }
+          @keyframes toaster-light {
+            0%, 100% { background-color: rgba(255, 255, 255, 0.9); }
+            50% { background-color: rgba(255, 253, 230, 0.95); }
+          }
+          @keyframes pop-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          @keyframes fade-slide-up {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 rgba(251, 191, 36, 0); }
+            50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.7); }
+          }
+          
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+          .animate-float-slow {
+            animation: float 5s ease-in-out infinite;
+          }
+          .animate-rotate-slow {
+            animation: rotate-slow 3s ease-in-out alternate infinite;
+          }
+          .animate-pulse-scale {
+            animation: pulse-scale 1.5s ease-in-out infinite;
+          }
+          .animate-upload-appear {
+            animation: upload-appear 0.8s ease-out forwards 0.5s;
+          }
+          .animate-toaster-light {
+            animation: toaster-light 1.5s ease-in-out infinite;
+          }
+          .animate-pop-in {
+            animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+          }
+          .animate-pulse-glow {
+            animation: pulse-glow 1s ease-in-out;
+          }
+          
+          .flame-animation {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+          }
+          
+          .flame {
+            position: absolute;
+            bottom: 15%;
+            width: 60%;
+            height: 60%;
+            border-radius: 50% 50% 20% 20%;
+            opacity: 0.8;
+            filter: blur(5px);
+            transform-origin: center bottom;
+          }
+          
+          .flame-1 {
+            background: linear-gradient(to top, #ff9500, #ff5e3a);
+            z-index: 3;
+            animation: flame1 1s infinite alternate;
+          }
+          
+          .flame-2 {
+            width: 45%;
+            height: 45%;
+            background: linear-gradient(to top, #ffcc00, #ff9500);
+            z-index: 2;
+            animation: flame2 1.33s infinite alternate;
+          }
+          
+          .flame-3 {
+            width: 30%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 1;
+            animation: flame3 0.9s infinite alternate;
+          }
+          
+          @keyframes flame1 {
+            0%, 100% { transform: scaleY(1) scaleX(1) rotate(-2deg); }
+            50% { transform: scaleY(1.1) scaleX(0.9) rotate(2deg); }
+          }
+          
+          @keyframes flame2 {
+            0%, 100% { transform: scaleY(0.9) translateX(-5px); }
+            50% { transform: scaleY(1.1) translateX(5px); }
+          }
+          
+          @keyframes flame3 {
+            0%, 100% { transform: scaleY(0.8) translateX(2px); opacity: 0.6; }
+            50% { transform: scaleY(1.2) translateX(-2px); opacity: 0.8; }
+          }
+          
+          .demo-step {
+            opacity: 0;
+            transform: translateX(100%);
+          }
+          
+          .demo-step.active {
+            opacity: 1;
+            transform: translateX(0);
+          }
+          
+          .hover-bounce:hover {
+            animation: bounce 0.5s ease;
+          }
+          
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+          }
+        </style>
+      `}} />
+
       <NavBar />
       <main className="flex-1">
         {/* Hero Section */}
@@ -452,4 +594,29 @@ const Home: React.FC = () => {
             <div className="flex space-x-4 mt-4 md:mt-0">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.6
+                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                </svg>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover-bounce">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default Home;
