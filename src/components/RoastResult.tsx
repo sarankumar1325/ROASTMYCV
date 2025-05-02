@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Thermometer, Share2, Copy, Download, Award, AlertTriangle, CheckCircle } from "lucide-react";
+import { Thermometer, Share2, Copy, Download, Award, AlertTriangle, CheckCircle, FileText } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
@@ -322,6 +322,17 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
           </Button>
         </div>
       </div>
+      
+      {/* Full roast content at the top */}
+      <Card className="mb-6 overflow-hidden border-2 animate-scale-in">
+        <CardHeader className="bg-gradient-to-r from-amber-500 to-red-600 text-white flex flex-row justify-between items-center">
+          <CardTitle className="text-xl">Full Roast Content</CardTitle>
+          <FileText size={20} className="text-white" />
+        </CardHeader>
+        <CardContent className="p-6 whitespace-pre-wrap prose max-w-none">
+          {result}
+        </CardContent>
+      </Card>
       
       {/* Roast level indicator */}
       <Card className="mb-6 overflow-hidden border-2 animate-scale-in">

@@ -113,121 +113,156 @@ const Home: React.FC = () => {
           </div>
         </section>
         
-        {/* Demo Carousel */}
-        <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        {/* Enhanced Demo Carousel */}
+        <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-amber-300 filter blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-red-300 filter blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+          </div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-3xl font-bold text-center mb-6">How It Works</h2>
+            <p className="text-center text-gray-500 mb-12 max-w-2xl mx-auto">Experience the magic of our resume roaster in three simple steps</p>
             
             <div 
               ref={demoRef}
-              className="max-w-3xl mx-auto h-72 relative overflow-hidden rounded-lg shadow-lg border"
+              className="max-w-4xl mx-auto h-96 relative overflow-hidden rounded-xl shadow-2xl border border-gray-100 bg-white"
             >
               {/* Demo Step 1 */}
-              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
-                <div className="flex items-center justify-center space-x-6">
-                  <div className="w-24 h-32 border-2 border-gray-300 rounded bg-gray-100 flex items-center justify-center relative animate-slide-in">
-                    <div className="absolute inset-2 border border-gray-400 bg-white">
-                      <div className="h-2 w-12 bg-gray-400 mx-auto mt-2"></div>
-                      <div className="h-1 w-14 bg-gray-300 mx-auto mt-2"></div>
-                      <div className="h-1 w-10 bg-gray-300 mx-auto mt-1"></div>
-                      <div className="h-1 w-12 bg-gray-300 mx-auto mt-1"></div>
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex flex-col items-center justify-center space-y-8">
+                  <div className="relative">
+                    <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">1</div>
+                    <div className="w-32 h-40 border-2 border-gray-300 rounded-lg bg-white flex items-center justify-center relative animate-float">
+                      <div className="absolute inset-4 border border-gray-400 bg-gray-50">
+                        <div className="h-2 w-16 bg-gray-400 mx-auto mt-4"></div>
+                        <div className="h-1 w-20 bg-gray-300 mx-auto mt-3"></div>
+                        <div className="h-1 w-14 bg-gray-300 mx-auto mt-2"></div>
+                        <div className="h-1 w-18 bg-gray-300 mx-auto mt-2"></div>
+                      </div>
+                      
+                      {/* Upload Icon Animation */}
+                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-white rounded-full border-2 border-amber-500 flex items-center justify-center opacity-0 animate-upload-appear">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-xl font-medium">Upload your resume</div>
+                  <div>
+                    <h3 className="text-2xl font-medium text-center mb-2">Upload your resume</h3>
+                    <p className="text-gray-500 text-center max-w-xs">Share your resume in PDF format and let our AI analyze it</p>
+                  </div>
                 </div>
               </div>
               
               {/* Demo Step 2 */}
-              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
-                <div className="flex items-center justify-center space-x-6">
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-amber-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex flex-col items-center justify-center space-y-8">
                   <div className="relative">
-                    <div className="w-20 h-24 bg-gradient-to-r from-amber-500 to-red-600 rounded-lg flex items-center justify-center">
-                      <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-16 h-3 bg-gray-800 rounded-t-lg"></div>
-                      <div className="w-14 h-20 bg-gray-100 animate-toaster-paper"></div>
+                    <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">2</div>
+                    <div className="w-40 h-40 relative">
+                      <div className="absolute inset-0 w-32 h-32 bg-gradient-to-r from-amber-500 to-red-600 rounded-lg flex items-center justify-center shadow-lg animate-rotate-slow">
+                        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-4 bg-gray-800 rounded-t-lg"></div>
+                        <div className="w-20 h-24 bg-white animate-toaster-light">
+                          <div className="h-full w-full overflow-hidden">
+                            {/* Flame animation */}
+                            <div className="flame-animation">
+                              <div className="flame flame-1"></div>
+                              <div className="flame flame-2"></div>
+                              <div className="flame flame-3"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Heat slider */}
+                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-36 h-8 bg-white rounded-full shadow-md flex items-center px-2 opacity-0 animate-fade-slide-up" style={{ animationDelay: "0.7s" }}>
+                        <div className="w-full h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 w-3/4 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 rounded-full relative">
+                            <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border border-gray-300 shadow-sm"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-xl font-medium">Select your roast intensity</div>
+                  <div>
+                    <h3 className="text-2xl font-medium text-center mb-2">Select your heat level</h3>
+                    <p className="text-gray-500 text-center max-w-xs">Choose between mild, medium, or savage roast intensity</p>
+                  </div>
                 </div>
               </div>
               
               {/* Demo Step 3 */}
-              <div className="demo-step absolute inset-0 bg-white flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
-                <div className="flex items-center justify-center space-x-6">
-                  <div className="w-36 h-24 border-2 border-gray-200 rounded-lg bg-white p-2 shadow-md animate-fade-in">
-                    <div className="h-2 w-20 bg-gradient-to-r from-amber-500 to-red-600 rounded mb-2"></div>
-                    <div className="h-1 w-full bg-gray-200 rounded mb-1"></div>
-                    <div className="h-1 w-4/5 bg-gray-200 rounded mb-1"></div>
-                    <div className="h-1 w-3/5 bg-gray-200 rounded"></div>
+              <div className="demo-step absolute inset-0 bg-gradient-to-br from-white to-red-50 flex items-center justify-center p-8 transition-all duration-700 opacity-0 translate-x-full">
+                <div className="flex flex-col items-center justify-center space-y-8">
+                  <div className="relative">
+                    <div className="absolute -top-6 -left-6 bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">3</div>
+                    
+                    <div className="w-60 h-48 relative">
+                      {/* Result cards stack */}
+                      <div className="absolute top-0 left-0 w-48 h-32 bg-white rounded-lg border border-gray-200 shadow-md p-3 transform -rotate-6 animate-float-slow">
+                        <div className="h-2 w-16 bg-amber-500 rounded mb-2"></div>
+                        <div className="h-1 w-full bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-3/4 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-1/2 bg-gray-200 rounded"></div>
+                      </div>
+                      <div className="absolute top-4 left-4 w-48 h-32 bg-white rounded-lg border border-gray-200 shadow-md p-3 transform rotate-3 animate-float" style={{ animationDelay: "0.2s" }}>
+                        <div className="h-2 w-16 bg-red-500 rounded mb-2"></div>
+                        <div className="h-1 w-full bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-4/5 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-2/3 bg-gray-200 rounded"></div>
+                      </div>
+                      <div className="absolute top-8 left-8 w-48 h-32 bg-white rounded-lg border border-gray-200 shadow-lg p-3 animate-pop-in" style={{ animationDelay: "0.4s" }}>
+                        <div className="h-2 w-16 bg-gradient-to-r from-amber-500 to-red-600 rounded mb-2"></div>
+                        <div className="h-1 w-full bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-3/5 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-1 w-4/5 bg-gray-200 rounded"></div>
+                        
+                        {/* Badge overlay */}
+                        <div className="absolute -right-3 -top-3 w-12 h-12 bg-gradient-to-br from-amber-500 to-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg animate-pulse-scale" style={{ animationDelay: "0.7s" }}>
+                          <div className="text-center">
+                            <div className="text-xs">85%</div>
+                            <div className="text-[8px]">Roasted</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xl font-medium">Get your honest roast feedback</div>
+                  <div>
+                    <h3 className="text-2xl font-medium text-center mb-2">Get honest feedback</h3>
+                    <p className="text-gray-500 text-center max-w-xs">Receive detailed insights with actionable improvements for your resume</p>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="flex justify-center mt-8 space-x-2">
-              <button 
-                onClick={() => {
-                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-                  demoStepRef.current = 1;
-                  demoIntervalRef.current = setInterval(() => {
-                    const step = demoStepRef.current;
+            <div className="flex justify-center mt-8 gap-3">
+              {[1, 2, 3].map((step) => (
+                <button 
+                  key={step}
+                  onClick={() => {
+                    if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+                    demoStepRef.current = step;
+                    demoIntervalRef.current = setInterval(() => {
+                      const currStep = demoStepRef.current;
+                      if (demoRef.current) {
+                        const demoSteps = demoRef.current.querySelectorAll('.demo-step');
+                        demoSteps.forEach((el) => el.classList.remove('active'));
+                        if (demoSteps[currStep - 1]) demoSteps[currStep - 1].classList.add('active');
+                      }
+                      demoStepRef.current = currStep < 3 ? currStep + 1 : 1;
+                    }, 4000);
                     if (demoRef.current) {
                       const demoSteps = demoRef.current.querySelectorAll('.demo-step');
                       demoSteps.forEach((el) => el.classList.remove('active'));
                       if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
                     }
-                    demoStepRef.current = step < 3 ? step + 1 : 1;
-                  }, 4000);
-                  if (demoRef.current) {
-                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
-                    demoSteps.forEach((el) => el.classList.remove('active'));
-                    if (demoSteps[0]) demoSteps[0].classList.add('active');
-                  }
-                }}
-                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
-              ></button>
-              <button 
-                onClick={() => {
-                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-                  demoStepRef.current = 2;
-                  demoIntervalRef.current = setInterval(() => {
-                    const step = demoStepRef.current;
-                    if (demoRef.current) {
-                      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
-                      demoSteps.forEach((el) => el.classList.remove('active'));
-                      if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
-                    }
-                    demoStepRef.current = step < 3 ? step + 1 : 1;
-                  }, 4000);
-                  if (demoRef.current) {
-                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
-                    demoSteps.forEach((el) => el.classList.remove('active'));
-                    if (demoSteps[1]) demoSteps[1].classList.add('active');
-                  }
-                }}
-                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
-              ></button>
-              <button 
-                onClick={() => {
-                  if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-                  demoStepRef.current = 3;
-                  demoIntervalRef.current = setInterval(() => {
-                    const step = demoStepRef.current;
-                    if (demoRef.current) {
-                      const demoSteps = demoRef.current.querySelectorAll('.demo-step');
-                      demoSteps.forEach((el) => el.classList.remove('active'));
-                      if (demoSteps[step - 1]) demoSteps[step - 1].classList.add('active');
-                    }
-                    demoStepRef.current = step < 3 ? step + 1 : 1;
-                  }, 4000);
-                  if (demoRef.current) {
-                    const demoSteps = demoRef.current.querySelectorAll('.demo-step');
-                    demoSteps.forEach((el) => el.classList.remove('active'));
-                    if (demoSteps[2]) demoSteps[2].classList.add('active');
-                  }
-                }}
-                className="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-500 transition-colors"
-              ></button>
+                  }}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${demoStepRef.current === step ? 'bg-amber-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
+                  aria-label={`Go to demo step ${step}`}
+                ></button>
+              ))}
             </div>
           </div>
         </section>
@@ -442,6 +477,143 @@ const Home: React.FC = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Add animation keyframes in global styles */}
+      <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0) rotate(-6deg); }
+          50% { transform: translateY(-6px) rotate(-6deg); }
+        }
+        
+        @keyframes rotate-slow {
+          0% { transform: rotate(0deg); }
+          25% { transform: rotate(3deg); }
+          75% { transform: rotate(-3deg); }
+          100% { transform: rotate(0deg); }
+        }
+        
+        @keyframes toaster-light {
+          0%, 100% { transform: translateY(0); opacity: 0.9; }
+          50% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes upload-appear {
+          0% { opacity: 0; transform: translate(-50%, 20px); }
+          70% { opacity: 1; transform: translate(-50%, -10px); }
+          90% { transform: translate(-50%, 5px); }
+          100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+        
+        @keyframes fade-slide-up {
+          from { opacity: 0; transform: translate(-50%, 20px); }
+          to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        @keyframes pop-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          80% { transform: scale(1.05); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes pulse-scale {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+        
+        @keyframes flame {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(1.2); }
+        }
+
+        .flame-animation {
+          position: relative;
+          width: 100%;
+          height: 60%;
+          transform: rotate(180deg);
+          left: 0;
+          bottom: -10px;
+        }
+        
+        .flame {
+          position: absolute;
+          bottom: 0;
+          border-radius: 50% 50% 20% 20%;
+        }
+        
+        .flame-1 {
+          width: 15px;
+          height: 15px;
+          background: rgba(255, 80, 0, 0.8);
+          left: 30%;
+          animation: flame 1s ease-in-out infinite;
+        }
+        
+        .flame-2 {
+          width: 12px;
+          height: 12px;
+          background: rgba(255, 160, 0, 0.8);
+          left: 45%;
+          animation: flame 0.8s ease-in-out infinite;
+          animation-delay: 0.1s;
+        }
+        
+        .flame-3 {
+          width: 10px;
+          height: 10px;
+          background: rgba(255, 230, 0, 0.8);
+          left: 60%;
+          animation: flame 1.2s ease-in-out infinite;
+          animation-delay: 0.2s;
+        }
+        
+        .demo-step {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        
+        .demo-step.active {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-rotate-slow {
+          animation: rotate-slow 5s ease-in-out infinite;
+        }
+        
+        .animate-toaster-light {
+          animation: toaster-light 2s ease-in-out infinite;
+        }
+        
+        .animate-upload-appear {
+          animation: upload-appear 1s forwards;
+          animation-delay: 0.5s;
+        }
+        
+        .animate-fade-slide-up {
+          animation: fade-slide-up 0.5s forwards;
+        }
+        
+        .animate-pop-in {
+          animation: pop-in 0.6s forwards;
+        }
+        
+        .animate-pulse-scale {
+          animation: pulse-scale 2s infinite;
+        }
+      `}</style>
     </div>
   );
 };
