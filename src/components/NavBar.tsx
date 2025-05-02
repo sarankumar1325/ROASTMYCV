@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, User, FileText, DollarSign, Menu, X } from "lucide-react";
@@ -115,7 +114,7 @@ const NavBar: React.FC = () => {
                       Sign In
                     </Button>
                   </SignInButton>
-                  <SignInButton mode="modal" afterSignInUrl="/roaster">
+                  <SignInButton mode="modal">
                     <Button 
                       className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700"
                       size="sm"
