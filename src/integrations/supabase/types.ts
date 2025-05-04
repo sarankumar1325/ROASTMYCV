@@ -9,7 +9,165 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          resume_id: string | null
+          session_title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resume_id?: string | null
+          session_title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resume_id?: string | null
+          session_title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback: {
+        Row: {
+          comments: string | null
+          created_at: string
+          id: string
+          message_id: string
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          id?: string
+          message_id: string
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          id?: string
+          message_id?: string
+          rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          chat_session_id: string
+          content: string
+          id: string
+          metadata: Json | null
+          sender: Database["public"]["Enums"]["sender_type"]
+          timestamp: string
+        }
+        Insert: {
+          chat_session_id: string
+          content: string
+          id?: string
+          metadata?: Json | null
+          sender: Database["public"]["Enums"]["sender_type"]
+          timestamp?: string
+        }
+        Update: {
+          chat_session_id?: string
+          content?: string
+          id?: string
+          metadata?: Json | null
+          sender?: Database["public"]["Enums"]["sender_type"]
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_session_id_fkey"
+            columns: ["chat_session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          last_login: string | null
+          settings: Json | null
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          last_login?: string | null
+          settings?: Json | null
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          last_login?: string | null
+          settings?: Json | null
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          parsed_text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          parsed_text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          parsed_text?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +176,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      sender_type: "user" | "ai"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +291,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      sender_type: ["user", "ai"],
+    },
   },
 } as const
