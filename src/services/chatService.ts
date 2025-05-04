@@ -1,97 +1,121 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import type { ChatSession, Message, MessageSender } from '@/types/database';
+import { useAuth } from '@clerk/clerk-react';
 
-// API Key - in a real application, this should be stored securely
-const API_KEY = "AIzaSyC74WevNjWdIdIhdJ9iG_MCSZbEhBxjrtg";
+export interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: string;
+  chat_session_id: string;
+  metadata: Record<string, any>;
+}
 
-// Initialize the chat model
-const chatModel = new ChatGoogleGenerativeAI({
-  apiKey: API_KEY,
-  modelName: "gemini-2.0-flash",
-  maxOutputTokens: 1024,
-  temperature: 0.7,
-});
+export interface ChatSession {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  session_title: string | null;
+  user_id: string;
+  resume_id: string | null;
+}
 
-// Chat Sessions
-export const createChatSession = async (
-  resumeId: string | null = null, 
-  title: string = 'New Chat Session'
-): Promise<ChatSession | null> => {
+// Function to get user ID from Clerk
+const getUserId = () => {
+  const auth = useAuth();
+  return auth.userId || '';
+};
+
+export const createChatSession = async (title: string, resumeId?: string): Promise<ChatSession | null> => {
   try {
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
+    const userId = getUserId();
     
-    if (!user) return null;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
     
     const { data, error } = await supabase
       .from('chat_sessions')
       .insert({
-        user_id: user.id,
-        resume_id: resumeId,
-        session_title: title
+        user_id: userId,
+        session_title: title,
+        resume_id: resumeId || null
       })
-      .select('*')
+      .select()
       .single();
     
     if (error) throw error;
-    return data;
+    return data as ChatSession;
   } catch (error) {
     console.error('Error creating chat session:', error);
     return null;
   }
 };
 
-export const getChatSessions = async (): Promise<ChatSession[]> => {
+export const getChatSession = async (sessionId: string): Promise<ChatSession | null> => {
   try {
     const { data, error } = await supabase
       .from('chat_sessions')
       .select('*')
-      .order('updated_at', { ascending: false });
-    
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching chat sessions:', error);
-    return [];
-  }
-};
-
-export const getChatSession = async (id: string): Promise<ChatSession | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('chat_sessions')
-      .select('*')
-      .eq('id', id)
+      .eq('id', sessionId)
       .single();
     
     if (error) throw error;
-    return data;
+    return data as ChatSession;
   } catch (error) {
     console.error('Error fetching chat session:', error);
     return null;
   }
 };
 
-export const updateChatSessionTitle = async (id: string, title: string): Promise<boolean> => {
+export const getChatSessionsByUser = async (): Promise<ChatSession[]> => {
   try {
-    const { error } = await supabase
+    const userId = getUserId();
+    
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    const { data, error } = await supabase
       .from('chat_sessions')
-      .update({ session_title: title })
-      .eq('id', id);
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return true;
+    return (data || []) as ChatSession[];
   } catch (error) {
-    console.error('Error updating chat session title:', error);
-    return false;
+    console.error('Error fetching chat sessions:', error);
+    return [];
   }
 };
 
-// Messages
-export const getMessages = async (chatSessionId: string): Promise<Message[]> => {
+export const saveMessage = async (
+  chat_session_id: string,
+  content: string,
+  sender: 'user' | 'ai',
+  metadata: Record<string, any> | null = null
+): Promise<Message | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        chat_session_id,
+        content,
+        sender,
+        metadata,
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data as Message;
+  } catch (error) {
+    console.error('Error saving message:', error);
+    return null;
+  }
+};
+
+export const getMessagesBySessionId = async (chatSessionId: string): Promise<Message[]> => {
   try {
     const { data, error } = await supabase
       .from('messages')
@@ -104,80 +128,5 @@ export const getMessages = async (chatSessionId: string): Promise<Message[]> => 
   } catch (error) {
     console.error('Error fetching messages:', error);
     return [];
-  }
-};
-
-export const sendMessage = async (
-  chatSessionId: string,
-  content: string,
-  sender: MessageSender = 'user'
-): Promise<Message | null> => {
-  try {
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) return null;
-    
-    // Insert the message
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({
-        chat_session_id: chatSessionId,
-        content,
-        sender
-      })
-      .select('*')
-      .single();
-    
-    if (error) throw error;
-    
-    // If this is a user message, generate an AI response
-    if (sender === 'user') {
-      // Get all previous messages in this chat
-      const previousMessages = await getMessages(chatSessionId);
-      
-      // Format messages for LangChain
-      const langchainMessages = previousMessages.map(msg => 
-        msg.sender === 'user' 
-          ? new HumanMessage(msg.content) 
-          : new AIMessage(msg.content)
-      );
-      
-      // Add current message
-      langchainMessages.push(new HumanMessage(content));
-      
-      // Get AI response
-      try {
-        const aiResponse = await chatModel.invoke(langchainMessages);
-        const aiContent = aiResponse.content as string;
-        
-        // Save AI response
-        await sendMessage(chatSessionId, aiContent, 'ai');
-      } catch (aiError) {
-        console.error('Error getting AI response:', aiError);
-        await sendMessage(
-          chatSessionId, 
-          "Sorry, I encountered an error processing your message. Please try again.", 
-          'ai'
-        );
-      }
-    }
-    
-    return data as Message;
-  } catch (error) {
-    console.error('Error sending message:', error);
-    return null;
-  }
-};
-
-// Update the chat session's updated_at timestamp
-export const touchChatSession = async (chatSessionId: string): Promise<void> => {
-  try {
-    await supabase
-      .from('chat_sessions')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', chatSessionId);
-  } catch (error) {
-    console.error('Error updating chat session timestamp:', error);
   }
 };
