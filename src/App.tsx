@@ -55,6 +55,10 @@ const App = () => (
           <Route path="/chat" element={<ProtectedRoute element={<ChatPage />} />} />
           <Route path="/chat/:sessionId" element={<ProtectedRoute element={<ChatPage />} />} />
           
+          {/* No longer using Clerk auth */}
+          {/* <Route path="/sign-in" element={<Navigate to="/auth" replace />} />
+          <Route path="/sign-up" element={<Navigate to="/auth" replace />} /> */}
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

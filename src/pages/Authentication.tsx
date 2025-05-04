@@ -13,8 +13,8 @@ import Hyperspeed from '../components/Hyperspeed';
 const Authentication: React.FC = () => {
   const { user, loading, signIn, signUp } = useSupabaseAuth();
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('test@example.com'); // Pre-filled for testing
+  const [password, setPassword] = useState('password123'); // Pre-filled for testing
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
   
@@ -49,7 +49,7 @@ const Authentication: React.FC = () => {
       toast({
         title: isSignUp ? 'Account created' : 'Welcome back',
         description: isSignUp 
-          ? 'Your account has been created successfully. Please check your email to confirm your account.'
+          ? 'Your account has been created successfully and you are signed in.'
           : 'You have successfully signed in.',
       });
     } catch (error: any) {
