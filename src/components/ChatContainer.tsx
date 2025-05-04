@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import { sendMessage } from '../services/chatService';
+import { saveMessage } from '../services/chatService';
 import { toast } from "@/hooks/use-toast";
 import type { Message } from '@/types/database';
 
@@ -28,7 +28,7 @@ const ChatContainer: React.FC = () => {
       // Add the new message to the history and send to API
       const updatedMessages = [...messages, newUserMessage];
       const chatSessionId = "temporary-session-id"; // Replace with actual session ID in production
-      const response = await sendMessage(chatSessionId, text, 'user');
+      const response = await saveMessage(chatSessionId, text, 'user');
       
       if (response) {
         // Add bot response to chat

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@clerk/clerk-react';
 
@@ -25,7 +26,7 @@ const getUserId = () => {
   return auth.userId || '';
 };
 
-export const createChatSession = async (title: string, resumeId?: string): Promise<ChatSession | null> => {
+export const createChatSession = async (title: string = 'New Chat Session', resumeId?: string): Promise<ChatSession | null> => {
   try {
     const userId = getUserId();
     
@@ -102,7 +103,7 @@ export const saveMessage = async (
         chat_session_id,
         content,
         sender,
-        metadata,
+        metadata: metadata || {}
       })
       .select()
       .single();
@@ -113,6 +114,16 @@ export const saveMessage = async (
     console.error('Error saving message:', error);
     return null;
   }
+};
+
+// Add sendMessage as an alias for saveMessage for backward compatibility
+export const sendMessage = async (
+  chat_session_id: string,
+  content: string,
+  sender: 'user' | 'ai' = 'user',
+  metadata: Record<string, any> | null = null
+): Promise<Message | null> => {
+  return saveMessage(chat_session_id, content, sender, metadata);
 };
 
 export const getMessagesBySessionId = async (chatSessionId: string): Promise<Message[]> => {
@@ -128,5 +139,22 @@ export const getMessagesBySessionId = async (chatSessionId: string): Promise<Mes
   } catch (error) {
     console.error('Error fetching messages:', error);
     return [];
+  }
+};
+
+// Add getMessages as an alias for getMessagesBySessionId
+export const getMessages = getMessagesBySessionId;
+
+// Add touchChatSession function to update the timestamp of a chat session
+export const touchChatSession = async (sessionId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('chat_sessions')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', sessionId);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error updating chat session timestamp:', error);
   }
 };

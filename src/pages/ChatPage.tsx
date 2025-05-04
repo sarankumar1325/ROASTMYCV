@@ -45,7 +45,7 @@ const ChatPage: React.FC = () => {
           setMessages(sessionMessages);
         } else {
           // Create new session
-          const newSession = await createChatSession();
+          const newSession = await createChatSession("New Chat Session");
           if (newSession) {
             navigate(`/chat/${newSession.id}`);
           } else {
