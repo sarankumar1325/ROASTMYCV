@@ -21,9 +21,15 @@ export const createChatSession = async (
   title: string = 'New Chat Session'
 ): Promise<ChatSession | null> => {
   try {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+    
     const { data, error } = await supabase
       .from('chat_sessions')
       .insert({
+        user_id: user.id,
         resume_id: resumeId,
         session_title: title
       })
@@ -94,7 +100,7 @@ export const getMessages = async (chatSessionId: string): Promise<Message[]> => 
       .order('timestamp', { ascending: true });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as Message[];
   } catch (error) {
     console.error('Error fetching messages:', error);
     return [];
@@ -107,6 +113,11 @@ export const sendMessage = async (
   sender: MessageSender = 'user'
 ): Promise<Message | null> => {
   try {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+    
     // Insert the message
     const { data, error } = await supabase
       .from('messages')
@@ -152,7 +163,7 @@ export const sendMessage = async (
       }
     }
     
-    return data;
+    return data as Message;
   } catch (error) {
     console.error('Error sending message:', error);
     return null;

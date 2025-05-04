@@ -8,10 +8,16 @@ export const submitFeedback = async (
   comments: string | null = null
 ): Promise<Feedback | null> => {
   try {
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+    
     const { data, error } = await supabase
       .from('feedback')
       .insert({
         message_id: messageId,
+        user_id: user.id,
         rating,
         comments
       })

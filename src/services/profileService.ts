@@ -10,7 +10,7 @@ export const getProfile = async (): Promise<Profile | null> => {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Profile;
   } catch (error) {
     console.error('Error fetching profile:', error);
     return null;
@@ -26,7 +26,7 @@ export const updateProfile = async (updates: Partial<Profile>): Promise<Profile 
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Profile;
   } catch (error) {
     console.error('Error updating profile:', error);
     return null;

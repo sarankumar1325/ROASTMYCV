@@ -2,11 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import { sendMessage, Message } from '../services/chatService';
+import { sendMessage } from '../services/chatService';
 import { toast } from "@/hooks/use-toast";
+import type { Message } from '@/types/database';
 
 const ChatContainer: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<{content: string; isUser: boolean}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -19,17 +20,20 @@ const ChatContainer: React.FC = () => {
   }, [messages]);
 
   const handleSendMessage = async (text: string) => {
-    const newUserMessage: Message = { content: text, isUser: true };
+    const newUserMessage = { content: text, isUser: true };
     setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
     
     try {
       // Add the new message to the history and send to API
       const updatedMessages = [...messages, newUserMessage];
-      const response = await sendMessage(updatedMessages);
+      const chatSessionId = "temporary-session-id"; // Replace with actual session ID in production
+      const response = await sendMessage(chatSessionId, text, 'user');
       
-      // Add bot response to chat
-      setMessages((prev) => [...prev, { content: response, isUser: false }]);
+      if (response) {
+        // Add bot response to chat
+        setMessages((prev) => [...prev, { content: response.content, isUser: false }]);
+      }
     } catch (error) {
       toast({
         title: "Error",
