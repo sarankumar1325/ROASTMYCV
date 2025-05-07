@@ -1,73 +1,112 @@
-# Welcome to your Lovable project
+# RoastMyCV
 
-## Project info
+![RoastMyCV Logo](public/favicon.ico)
 
-**URL**: https://lovable.dev/projects/06612f6f-1230-465e-9b4f-b52259f8db72
+## 🔥 About RoastMyCV
 
-## How can I edit this code?
+RoastMyCV is an AI-powered resume reviewing application that provides candid, constructive feedback on your CV/resume. Our platform helps job seekers improve their resumes by identifying weaknesses, suggesting improvements, and providing industry-specific recommendations to make your application stand out.
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- **AI-Powered Resume Analysis**: Upload your resume and get instant feedback
+- **Adjustable Intensity**: Control how direct and critical the feedback should be
+- **Industry-Specific Insights**: Receive tailored advice based on your target industry
+- **Interactive Chat Interface**: Discuss your resume improvements with our AI assistant
+- **Visual Resume Score**: Get a quantified evaluation of your resume's strengths and weaknesses
+- **Badge Generator**: Earn achievement badges as you improve your resume
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **User Profiles**: Save your resume history and track improvements over time
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/06612f6f-1230-465e-9b4f-b52259f8db72) and start prompting.
+## 🚀 Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 16.x or later
+- npm or Bun package manager
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/roastmycv.git
+cd roastmycv
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server:
+```bash
+npm run dev
+# or
+bun run dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to `http://localhost:8080` (or the port shown in your terminal)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Building for Production
 
-## What technologies are used for this project?
+```bash
+npm run build
+# or
+bun run build
+```
 
-This project is built with:
+## 🛠️ Technologies
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS with ShadcnUI components
+- **3D Effects**: Three.js for immersive visual elements
+- **Authentication**: Clerk
+- **Database**: Supabase
+- **AI Integration**: Google Generative AI / LangChain
+- **PDF Processing**: PDF.js
+- **Build Tool**: Vite
+- **Deployment**: Vercel
 
-## How can I deploy this project?
+## 📊 Project Structure
 
-Simply open [Lovable](https://lovable.dev/projects/06612f6f-1230-465e-9b4f-b52259f8db72) and click on Share -> Publish.
+- `src/components/`: UI components used throughout the application
+- `src/pages/`: Main application pages and routes
+- `src/hooks/`: Custom React hooks
+- `src/services/`: Services for handling API calls and business logic
+- `src/lib/`: Utility functions and helpers
+- `src/integrations/`: Integration with external services
 
-## Can I connect a custom domain to my Lovable project?
+## 🤝 Contributing
 
-Yes, you can!
+We welcome contributions to RoastMyCV! Please feel free to submit issues, feature requests, or pull requests.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📧 Contact
+
+If you have any questions or suggestions, feel free to reach out at:
+
+- Email: your-email@example.com
+- Twitter: [@roastmycv](https://twitter.com/roastmycv)
+- Website: [roastmycv.com](https://roastmycv.com)
+
+## 💡 Roadmap
+
+- [ ] Additional resume templates and formats
+- [ ] Industry expert networking features
+- [ ] Resume version comparison
+- [ ] Integration with job platforms
+- [ ] Premium features and subscription model
+
+---
+
+Built with ❤️ for job seekers worldwide
