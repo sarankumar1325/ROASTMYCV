@@ -1,6 +1,6 @@
 # RoastMyCV
 
-![RoastMyCV Logo](public/favicon.ico)
+
 
 ## 🔥 About RoastMyCV
 
@@ -95,10 +95,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 If you have any questions or suggestions, feel free to reach out at:
 
-- Email: your-email@example.com
-- Twitter: [@roastmycv](https://twitter.com/roastmycv)
-- Website: [roastmycv.com](https://roastmycv.com)
-
+- suryaprakashstech@gmail.com
+- sarankumar131313@gmail.com
+  
 ## 💡 Roadmap
 
 - [ ] Additional resume templates and formats
