@@ -116,11 +116,13 @@ const ResumeFormatChecker: React.FC = () => {
                   <span className="text-sm font-medium">Overall Score</span>
                   <span className="text-sm font-medium">{Math.round(overallScore)}%</span>
                 </div>
-                <Progress value={overallScore} className="h-3" 
+                <Progress 
+                  value={overallScore} 
                   className={`h-3 ${
                     overallScore >= 80 ? 'bg-green-500' :
                     overallScore >= 60 ? 'bg-amber-500' : 'bg-red-500'
-                  }`} />
+                  }`} 
+                />
               </div>
             </div>
             

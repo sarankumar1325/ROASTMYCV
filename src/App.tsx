@@ -13,6 +13,8 @@ import Pricing from "./pages/Pricing";
 import Roaster from "./pages/Roaster";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Tips from "./pages/Tips";
+import FormatChecker from "./pages/FormatChecker";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/sign-in" element={<Auth />} />
           <Route path="/sign-up" element={<Auth />} />
+          <Route path="/tips" element={<Tips />} />
+          <Route path="/format-checker" element={<FormatChecker />} />
 
           {/* Protected routes */}
           <Route path="/roaster" element={<PrivateRoute element={<Roaster />} />} />
