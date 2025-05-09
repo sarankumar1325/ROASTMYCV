@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/hooks/use-toast";
 import { 
   BookOpen, 
   FileText, 
@@ -12,7 +13,10 @@ import {
   Briefcase,
   GraduationCap,
   BarChart,
-  Heart 
+  Heart,
+  Download,
+  Share2,
+  Bookmark
 } from 'lucide-react';
 
 interface TipCardProps {
@@ -40,6 +44,117 @@ const TipCard: React.FC<TipCardProps> = ({ title, description, icon, tag }) => (
 );
 
 const ResumeTipsLibrary: React.FC = () => {
+  const [savedGuides, setSavedGuides] = useState<string[]>([]);
+  
+  const handleDownload = () => {
+    // Create printable version of the guide
+    const printContent = `
+      RESUME TIPS LIBRARY GUIDE
+      =========================
+      
+      RESUME ESSENTIALS
+      -----------------
+      • Clear Formatting: Use consistent fonts, spacing, and formatting. Aim for a clean, professional look that's easy to scan in 6 seconds.
+      • Keep It Concise: Limit your resume to 1-2 pages. Be ruthless about including only relevant information for the specific job.
+      • Quantify Achievements: Use numbers and percentages to demonstrate impact: 'Increased sales by 27%' is better than 'Increased sales significantly.'
+      • Avoid Clichés: Skip overused phrases like 'team player' or 'detail-oriented.' Show these qualities through specific examples instead.
+      • Tailor to Each Job: Customize your resume for each application by matching your skills and experience to the job description.
+      • ATS-Friendly Format: Use a simple layout with standard section headings and common fonts to ensure compatibility with Applicant Tracking Systems.
+      
+      QUICK CHECKLIST
+      --------------
+      ✓ Contact information is up-to-date and professional
+      ✓ Resume is tailored to the specific job description
+      ✓ Achievements are quantified with numbers when possible
+      ✓ Format is clean, consistent and easy to scan
+      ✓ Spelling and grammar are perfect
+      ✓ File is saved as a PDF unless otherwise specified
+      
+      KEY SECTIONS
+      -----------
+      Work Experience:
+      - Use reverse chronological order (most recent first)
+      - Include company name, location, job title, and dates
+      - Focus on achievements rather than responsibilities
+      - Start bullet points with strong action verbs
+      
+      Education:
+      - List degrees in reverse chronological order
+      - Include institution name, location, degree, and graduation date
+      - Add relevant coursework, honors, or projects if recent graduate
+      - Only include GPA if it's impressive (3.5+)
+      
+      Skills:
+      - Separate technical skills from soft skills
+      - Match keywords from the job description
+      - Be specific (e.g., "Adobe Photoshop" not just "Design Software")
+      - Consider including proficiency levels for technical skills
+      
+      Optional Sections:
+      - Projects: Highlight relevant personal or professional projects
+      - Certifications: Include relevant professional certifications
+      - Volunteer Experience: If relevant to the job or shows transferable skills
+      - Publications/Presentations: For academic or research positions
+      
+      Compiled by ResumeRoaster.com
+    `;
+    
+    // Create blob and download
+    const blob = new Blob([printContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Resume_Tips_Guide.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Guide Downloaded!",
+      description: "Your resume tips guide has been downloaded successfully.",
+    });
+  };
+  
+  const saveGuide = (guideName: string) => {
+    if (savedGuides.includes(guideName)) {
+      setSavedGuides(savedGuides.filter(name => name !== guideName));
+      toast({
+        title: "Guide Removed",
+        description: `"${guideName}" removed from your saved guides.`,
+      });
+    } else {
+      setSavedGuides([...savedGuides, guideName]);
+      toast({
+        title: "Guide Saved!",
+        description: `"${guideName}" added to your saved guides.`,
+      });
+    }
+  };
+  
+  const shareGuide = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Resume Tips Library',
+        text: 'Check out this helpful resume tips guide!',
+        url: window.location.href,
+      })
+      .then(() => {
+        toast({
+          title: "Guide Shared!",
+          description: "Thanks for sharing our resume tips guide.",
+        });
+      })
+      .catch(console.error);
+    } else {
+      // Fallback for browsers that don't support the Web Share API
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied!",
+        description: "Resume guide link copied to clipboard.",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
@@ -50,6 +165,30 @@ const ResumeTipsLibrary: React.FC = () => {
         <p className="text-gray-500 max-w-2xl mx-auto">
           Expert advice to help you craft a winning resume that gets you noticed by recruiters and hiring managers
         </p>
+      </div>
+      
+      <div className="flex justify-between items-center mb-4 max-w-4xl mx-auto">
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => saveGuide("Resume Tips Library")}
+            className="flex items-center gap-1"
+          >
+            <Bookmark className="h-4 w-4" fill={savedGuides.includes("Resume Tips Library") ? "currentColor" : "none"} />
+            {savedGuides.includes("Resume Tips Library") ? "Saved" : "Save Guide"}
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={shareGuide}
+            className="flex items-center gap-1"
+          >
+            <Share2 className="h-4 w-4" />
+            Share
+          </Button>
+        </div>
       </div>
       
       <Tabs defaultValue="essentials" className="max-w-4xl mx-auto">
@@ -446,9 +585,39 @@ const ResumeTipsLibrary: React.FC = () => {
       </Tabs>
       
       <div className="mt-12 text-center">
-        <Button className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700">
-          Download Complete Guide (PDF)
+        <Button 
+          className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 flex items-center gap-2"
+          onClick={handleDownload}
+        >
+          <Download className="h-4 w-4" />
+          Download Complete Guide (TXT)
         </Button>
+      </div>
+      
+      {/* New feature: Custom note taking */}
+      <div className="mt-8 max-w-4xl mx-auto">
+        <div className="bg-amber-50 p-6 rounded-lg border border-amber-100">
+          <h3 className="font-bold mb-3 flex items-center gap-2">
+            <FileText className="text-amber-500 h-5 w-5" />
+            Personal Resume Notes
+          </h3>
+          <textarea 
+            className="w-full p-3 border border-amber-200 rounded-md h-24 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            placeholder="Add your personal notes about your resume here..."
+          />
+          <div className="flex justify-end mt-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => toast({
+                title: "Notes Saved!",
+                description: "Your personal notes have been saved.",
+              })}
+            >
+              Save Notes
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

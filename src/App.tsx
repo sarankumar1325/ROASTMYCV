@@ -15,6 +15,8 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Tips from "./pages/Tips";
 import FormatChecker from "./pages/FormatChecker";
+import Templates from "./pages/Templates";
+import Progress from "./pages/Progress";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +44,8 @@ const App = () => (
           <Route path="/sign-up" element={<Auth />} />
           <Route path="/tips" element={<Tips />} />
           <Route path="/format-checker" element={<FormatChecker />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/progress" element={<Progress />} />
 
           {/* Protected routes */}
           <Route path="/roaster" element={<PrivateRoute element={<Roaster />} />} />
