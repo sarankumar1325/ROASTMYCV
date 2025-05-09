@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, User, FileText, DollarSign, Menu, X } from "lucide-react";
+import { Home, User, FileText, DollarSign, Menu, X, BookOpen, Check, Search } from "lucide-react";
 import Logo from './Logo';
 import { UserButton, SignInButton, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,31 @@ const NavBar: React.FC = () => {
       icon: FileText,
       animationClass: 'nav-roaster-icon',
       protected: true
+    },
+    {
+      name: 'Tips',
+      path: '/tips',
+      icon: BookOpen
+    },
+    {
+      name: 'Templates',
+      path: '/templates',
+      icon: Check
+    },
+    {
+      name: 'Progress',
+      path: '/progress',
+      icon: FileText
+    },
+    {
+      name: 'Keywords',
+      path: '/keyword-analyzer',
+      icon: Search
+    },
+    {
+      name: 'Checker',
+      path: '/format-checker',
+      icon: Check
     },
     {
       name: 'Pricing',

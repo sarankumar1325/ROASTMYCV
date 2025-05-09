@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
@@ -16,7 +16,8 @@ import {
   Heart,
   Download,
   Share2,
-  Bookmark
+  Bookmark,
+  Save
 } from 'lucide-react';
 
 interface TipCardProps {
@@ -45,6 +46,22 @@ const TipCard: React.FC<TipCardProps> = ({ title, description, icon, tag }) => (
 
 const ResumeTipsLibrary: React.FC = () => {
   const [savedGuides, setSavedGuides] = useState<string[]>([]);
+  const [personalNotes, setPersonalNotes] = useState<string>('');
+  const [isNotesSaved, setIsNotesSaved] = useState<boolean>(false);
+  
+  // Load saved data from localStorage on component mount
+  useEffect(() => {
+    const savedNotesFromStorage = localStorage.getItem('resumePersonalNotes');
+    if (savedNotesFromStorage) {
+      setPersonalNotes(savedNotesFromStorage);
+      setIsNotesSaved(true);
+    }
+    
+    const savedGuidesFromStorage = localStorage.getItem('savedResumeGuides');
+    if (savedGuidesFromStorage) {
+      setSavedGuides(JSON.parse(savedGuidesFromStorage));
+    }
+  }, []);
   
   const handleDownload = () => {
     // Create printable version of the guide
@@ -99,31 +116,49 @@ const ResumeTipsLibrary: React.FC = () => {
       Compiled by ResumeRoaster.com
     `;
     
-    // Create blob and download
-    const blob = new Blob([printContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Resume_Tips_Guide.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Guide Downloaded!",
-      description: "Your resume tips guide has been downloaded successfully.",
-    });
+    try {
+      // Create blob and download
+      const blob = new Blob([printContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Resume_Tips_Guide.txt';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+      toast({
+        title: "Guide Downloaded!",
+        description: "Your resume tips guide has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading the guide. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   const saveGuide = (guideName: string) => {
     if (savedGuides.includes(guideName)) {
-      setSavedGuides(savedGuides.filter(name => name !== guideName));
+      const newSavedGuides = savedGuides.filter(name => name !== guideName);
+      setSavedGuides(newSavedGuides);
+      localStorage.setItem('savedResumeGuides', JSON.stringify(newSavedGuides));
       toast({
         title: "Guide Removed",
         description: `"${guideName}" removed from your saved guides.`,
       });
     } else {
-      setSavedGuides([...savedGuides, guideName]);
+      const newSavedGuides = [...savedGuides, guideName];
+      setSavedGuides(newSavedGuides);
+      localStorage.setItem('savedResumeGuides', JSON.stringify(newSavedGuides));
       toast({
         title: "Guide Saved!",
         description: `"${guideName}" added to your saved guides.`,
@@ -153,6 +188,15 @@ const ResumeTipsLibrary: React.FC = () => {
         description: "Resume guide link copied to clipboard.",
       });
     }
+  };
+
+  const saveNotes = () => {
+    localStorage.setItem('resumePersonalNotes', personalNotes);
+    setIsNotesSaved(true);
+    toast({
+      title: "Notes Saved!",
+      description: "Your personal notes have been saved.",
+    });
   };
 
   return (
@@ -594,7 +638,7 @@ const ResumeTipsLibrary: React.FC = () => {
         </Button>
       </div>
       
-      {/* New feature: Custom note taking */}
+      {/* Personal notes feature */}
       <div className="mt-8 max-w-4xl mx-auto">
         <div className="bg-amber-50 p-6 rounded-lg border border-amber-100">
           <h3 className="font-bold mb-3 flex items-center gap-2">
@@ -604,17 +648,21 @@ const ResumeTipsLibrary: React.FC = () => {
           <textarea 
             className="w-full p-3 border border-amber-200 rounded-md h-24 focus:outline-none focus:ring-2 focus:ring-amber-300"
             placeholder="Add your personal notes about your resume here..."
+            value={personalNotes}
+            onChange={(e) => {
+              setPersonalNotes(e.target.value);
+              setIsNotesSaved(false);
+            }}
           />
           <div className="flex justify-end mt-2">
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => toast({
-                title: "Notes Saved!",
-                description: "Your personal notes have been saved.",
-              })}
+              onClick={saveNotes}
+              className="flex items-center gap-1"
             >
-              Save Notes
+              <Save className="h-4 w-4" />
+              {isNotesSaved ? "Saved" : "Save Notes"}
             </Button>
           </div>
         </div>
