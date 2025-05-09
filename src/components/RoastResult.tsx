@@ -1,13 +1,14 @@
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Thermometer, Share2, Copy, Download, Award, AlertTriangle, CheckCircle, FileText } from "lucide-react";
+import { Thermometer, Share2, Copy, Download, Award, AlertTriangle, CheckCircle, FileText, Volume2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import InsightPanel from "./InsightPanel";
 import BadgeGenerator from "./BadgeGenerator";
+import AudioFeedback from "./AudioFeedback";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface RoastResultProps {
   result: string;
@@ -19,6 +20,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
   const { toast } = useToast();
   const resultRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   
   useEffect(() => {
     // Auto-scroll to the result
@@ -352,10 +354,24 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
       <Card className="mb-6 overflow-hidden border-2 animate-scale-in">
         <CardHeader className="bg-gradient-to-r from-amber-500 to-red-600 text-white flex flex-row justify-between items-center">
           <CardTitle className="text-xl">Full Roast Content</CardTitle>
-          <FileText size={20} className="text-white" />
+          <div className="flex items-center gap-2">
+            <FileText size={20} className="text-white" />
+            <Volume2 size={20} className="text-white" />
+          </div>
         </CardHeader>
-        <CardContent className="p-6 whitespace-pre-wrap prose max-w-none">
-          {displayedResult}
+        <CardContent className="p-6">
+          <Tabs defaultValue="text" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="text">Text</TabsTrigger>
+              <TabsTrigger value="audio">Audio</TabsTrigger>
+            </TabsList>
+            <TabsContent value="text" className="whitespace-pre-wrap prose max-w-none">
+              {cleanFormattedText(result)}
+            </TabsContent>
+            <TabsContent value="audio">
+              <AudioFeedback text={cleanFormattedText(result)} />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
       
@@ -394,7 +410,7 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
       
       {/* Roast results in cards - responsive grid layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {resultSections.map((section, index) => (
+        {formatResults().map((section, index) => (
           <Card 
             key={index} 
             className="result-card overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
@@ -404,18 +420,30 @@ const RoastResult: React.FC<RoastResultProps> = ({ result, roastLevel, onReset }
               transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
               transitionDelay: `${index * 100}ms`
             }}
+            onClick={() => setActiveSection(section.title)}
           >
             <CardHeader className="border-b bg-gray-50 py-3 px-4">
               <CardTitle className="text-sm uppercase tracking-wide text-gray-700 flex items-center gap-2">
                 {getIconForSection(section.icon)}
-                {section.title}
+                <span>{section.title}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <div 
-                className="leading-relaxed text-base"
-                dangerouslySetInnerHTML={{ __html: formatContent(section.content) }}
-              />
+              <Tabs defaultValue="text" className="w-full">
+                <TabsList className="mb-2">
+                  <TabsTrigger value="text">Text</TabsTrigger>
+                  <TabsTrigger value="audio">Audio</TabsTrigger>
+                </TabsList>
+                <TabsContent value="text">
+                  <div 
+                    className="leading-relaxed text-base"
+                    dangerouslySetInnerHTML={{ __html: formatContent(section.content) }}
+                  />
+                </TabsContent>
+                <TabsContent value="audio">
+                  <AudioFeedback text={section.content} sectionTitle={section.title} />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         ))}
