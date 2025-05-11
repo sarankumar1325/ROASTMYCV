@@ -1,11 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Search, Download, Save, Link } from 'lucide-react';
+import { FileText, Search, Download, Save, Link, Upload } from 'lucide-react';
+import * as pdfjs from 'pdfjs-dist';
+
+// Ensure the PDF.js worker is correctly set up
+const pdfjsVersion = '3.11.174';
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsVersion}/pdf.worker.min.js`;
 
 const ResumeKeywordAnalyzer: React.FC = () => {
   const [jobDescription, setJobDescription] = useState<string>('');
@@ -15,6 +20,8 @@ const ResumeKeywordAnalyzer: React.FC = () => {
   const [isAnalyzed, setIsAnalyzed] = useState<boolean>(false);
   const [savedAnalyses, setSavedAnalyses] = useState<{name: string, matching: string[], missing: string[]}[]>([]);
   const [analysisName, setAnalysisName] = useState<string>('');
+  const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Common industry keywords to check against
   const industryKeywords = {
@@ -39,6 +46,18 @@ const ResumeKeywordAnalyzer: React.FC = () => {
       "time management", "organization", "customer service"
     ]
   };
+
+  // Load saved analyses from localStorage on component mount
+  React.useEffect(() => {
+    const savedAnalysesFromStorage = localStorage.getItem('resumeKeywordAnalyses');
+    if (savedAnalysesFromStorage) {
+      try {
+        setSavedAnalyses(JSON.parse(savedAnalysesFromStorage));
+      } catch (error) {
+        console.error('Error parsing saved analyses:', error);
+      }
+    }
+  }, []);
   
   const extractKeywords = (text: string): string[] => {
     // Convert to lowercase and remove special characters
@@ -95,6 +114,64 @@ const ResumeKeywordAnalyzer: React.FC = () => {
       description: `Found ${matching.length} matching keywords and ${missing.length} missing keywords.`,
     });
   };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoadingFile(true);
+    
+    try {
+      if (file.type === 'application/pdf') {
+        // Handle PDF file
+        const fileData = new Uint8Array(await file.arrayBuffer());
+        const pdfDocument = await pdfjs.getDocument({ data: fileData }).promise;
+        
+        let fullText = '';
+        
+        // Extract text from each page
+        for (let i = 1; i <= pdfDocument.numPages; i++) {
+          const page = await pdfDocument.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map((item: any) => item.str).join(' ');
+          fullText += pageText + ' ';
+        }
+        
+        setResumeContent(fullText);
+        toast({
+          title: "Resume Uploaded",
+          description: `Successfully extracted text from "${file.name}"`,
+        });
+      } else if (file.type === 'text/plain' || file.type === 'application/msword' || 
+                 file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // Handle text/Word files
+        const text = await file.text();
+        setResumeContent(text);
+        toast({
+          title: "Resume Uploaded",
+          description: `Successfully loaded text from "${file.name}"`,
+        });
+      } else {
+        toast({
+          title: "Unsupported File",
+          description: "Please upload a PDF, TXT, DOC or DOCX file.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error processing file:', error);
+      toast({
+        title: "Error Processing File",
+        description: "There was an error processing your file. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingFile(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
   
   const saveAnalysis = () => {
     if (!analysisName) {
@@ -124,6 +201,31 @@ const ResumeKeywordAnalyzer: React.FC = () => {
     });
     
     setAnalysisName('');
+  };
+
+  const loadAnalysis = (analysis: { name: string, matching: string[], missing: string[] }) => {
+    setMatchingKeywords(analysis.matching);
+    setMissingKeywords(analysis.missing);
+    setIsAnalyzed(true);
+    
+    toast({
+      title: "Analysis Loaded",
+      description: `"${analysis.name}" has been loaded.`,
+    });
+  };
+
+  const deleteAnalysis = (index: number, name: string) => {
+    const updatedAnalyses = [...savedAnalyses];
+    updatedAnalyses.splice(index, 1);
+    setSavedAnalyses(updatedAnalyses);
+    
+    // Update localStorage
+    localStorage.setItem('resumeKeywordAnalyses', JSON.stringify(updatedAnalyses));
+    
+    toast({
+      title: "Analysis Deleted",
+      description: `"${name}" has been removed from your saved analyses.`,
+    });
   };
   
   const downloadReport = () => {
@@ -213,12 +315,37 @@ Generated by ResumeRoaster.com
           
           <div>
             <label className="block font-medium mb-2">Your Resume</label>
-            <Textarea 
-              placeholder="Paste your resume content here..." 
-              className="h-60"
-              value={resumeContent}
-              onChange={(e) => setResumeContent(e.target.value)}
-            />
+            <div className="flex flex-col gap-2">
+              <Textarea 
+                placeholder="Paste your resume content here or upload a resume file..." 
+                className="h-60"
+                value={resumeContent}
+                onChange={(e) => setResumeContent(e.target.value)}
+              />
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.txt,.doc,.docx"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="resume-upload"
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1"
+                  disabled={isLoadingFile}
+                >
+                  <Upload className="h-4 w-4" />
+                  {isLoadingFile ? 'Loading...' : 'Upload Resume'}
+                </Button>
+                <span className="text-xs text-gray-500">
+                  Supported formats: PDF, TXT, DOC, DOCX
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -309,16 +436,34 @@ Generated by ResumeRoaster.com
         )}
         
         {savedAnalyses.length > 0 && (
-          <div className="bg-purple-50 p-6 rounded-lg border border-purple-100">
+          <div className="bg-purple-50 p-6 rounded-lg border border-purple-100 mb-8">
             <h3 className="font-bold mb-3">Your Saved Analyses</h3>
             <div className="space-y-2">
               {savedAnalyses.map((analysis, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-100">
                   <span className="font-medium">{analysis.name}</span>
-                  <div className="text-sm text-gray-500">
-                    <span className="text-green-600">{analysis.matching.length} matches</span>
-                    {" • "}
-                    <span className="text-amber-600">{analysis.missing.length} missing</span>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-gray-500">
+                      <span className="text-green-600">{analysis.matching.length} matches</span>
+                      {" • "}
+                      <span className="text-amber-600">{analysis.missing.length} missing</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => loadAnalysis(analysis)} 
+                      className="text-blue-600"
+                    >
+                      Load
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => deleteAnalysis(index, analysis.name)} 
+                      className="text-red-600"
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
               ))}
