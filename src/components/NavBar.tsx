@@ -1,8 +1,18 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Logo from './Logo';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,47 +21,120 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Settings } from 'lucide-react';
-
-const navLinks = [
-  { name: "Roast My CV", href: "/roaster" },
-  { name: "Templates", href: "/templates" },
-  { name: "Tips", href: "/tips" },
-  { name: "Format Checker", href: "/format-checker" },
-  { name: "Progress Tracker", href: "/progress" },
-  { name: "Keyword Analyzer", href: "/keyword-analyzer" },
-  { name: "Timeline Builder", href: "/timeline-builder" },
-  { name: "Power Words", href: "/power-words" }
-];
+import { FileText, Menu, Settings, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const NavBar: React.FC = () => {
   const { signOut } = useClerk();
   const { isSignedIn, user } = useUser();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Group related features into logical categories
+  const navGroups = [
+    {
+      title: "Resume Tools",
+      items: [
+        { name: "Roast My CV", href: "/roaster", description: "Get AI feedback on your resume" },
+        { name: "Format Checker", href: "/format-checker", description: "Verify your resume format" },
+        { name: "Keyword Analyzer", href: "/keyword-analyzer", description: "Match resume keywords to job descriptions" },
+      ]
+    },
+    {
+      title: "Resources",
+      items: [
+        { name: "Templates", href: "/templates", description: "Professional resume templates" },
+        { name: "Tips Library", href: "/tips", description: "Expert resume writing tips" },
+        { name: "Power Words", href: "/power-words", description: "Impact words for your resume" },
+      ]
+    },
+    {
+      title: "Tools",
+      items: [
+        { name: "Progress Tracker", href: "/progress", description: "Track your resume improvements" },
+        { name: "Timeline Builder", href: "/timeline-builder", description: "Create professional timelines" },
+      ]
+    }
+  ];
+
+  const ListItem = React.forwardRef<
+    React.ElementRef<"a">,
+    React.ComponentPropsWithoutRef<"a">
+  >(({ className, title, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <a
+            ref={ref}
+            className={cn(
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              className
+            )}
+            {...props}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+              {children}
+            </p>
+          </a>
+        </NavigationMenuLink>
+      </li>
+    );
+  });
+  ListItem.displayName = "ListItem";
 
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <div className="border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo and Branding */}
           <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-gray-800">
-              Lovable
+            <Link to="/" className="flex items-center">
+              <Logo variant="small" showText={false} className="mr-2" />
+              <span className="text-xl font-semibold text-gray-800">Resume Roaster</span>
             </Link>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.href}
-                    className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
+          
+          {/* Desktop Navigation Menu */}
+          <div className="hidden md:block">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {navGroups.map((group) => (
+                  <NavigationMenuItem key={group.title}>
+                    <NavigationMenuTrigger className="bg-transparent">{group.title}</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                        {group.items.map((item) => (
+                          <ListItem 
+                            key={item.name} 
+                            title={item.name} 
+                            href={item.href}
+                          >
+                            {item.description}
+                          </ListItem>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+          
+          {/* User Authentication & Mobile Menu */}
           <div className="flex items-center">
-            <div className="ml-4 flex items-center md:ml-6">
+            {/* Mobile menu button */}
+            <div className="md:hidden flex">
+              <Button 
+                variant="ghost" 
+                className="mr-2" 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu />
+              </Button>
+            </div>
+            
+            {/* Authentication */}
+            <div className="ml-4">
               {isSignedIn ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -85,20 +168,43 @@ const NavBar: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <>
+                <div className="flex items-center">
                   <Link to="/sign-in">
                     <Button variant="outline" className="mr-2">Sign In</Button>
                   </Link>
                   <Link to="/sign-up">
                     <Button>Sign Up</Button>
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
+        
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-2 pb-4">
+            {navGroups.map((group) => (
+              <div key={group.title} className="mt-3">
+                <div className="px-2 text-sm font-medium text-gray-600">{group.title}</div>
+                <div className="mt-1">
+                  {group.items.map((item) => (
+                    <Link 
+                      key={item.name} 
+                      to={item.href} 
+                      className="block px-3 py-2 text-base rounded-md hover:bg-gray-100"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    </nav>
+    </div>
   );
 };
 
