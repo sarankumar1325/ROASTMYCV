@@ -1,228 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, User, FileText, DollarSign, Menu, X, BookOpen, Check, Search } from "lucide-react";
-import Logo from './Logo';
-import { UserButton, SignInButton, useAuth } from '@clerk/clerk-react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useClerk, useUser } from '@clerk/clerk-react';
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Settings } from 'lucide-react';
+
+const navLinks = [
+  { name: "Roast My CV", href: "/roaster" },
+  { name: "Templates", href: "/templates" },
+  { name: "Tips", href: "/tips" },
+  { name: "Format Checker", href: "/format-checker" },
+  { name: "Progress Tracker", href: "/progress" },
+  { name: "Keyword Analyzer", href: "/keyword-analyzer" },
+  { name: "Timeline Builder", href: "/timeline-builder" },
+  { name: "Power Words", href: "/power-words" }
+];
 
 const NavBar: React.FC = () => {
-  const location = useLocation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const { isSignedIn } = useAuth();
-  
-  // Track scroll position for navbar effects
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-  const navItems = [
-    {
-      name: 'Home',
-      path: '/',
-      icon: Home
-    },
-    {
-      name: 'Profile',
-      path: '/profile',
-      icon: User,
-      protected: true
-    },
-    {
-      name: 'Roaster',
-      path: '/roaster',
-      icon: FileText,
-      animationClass: 'nav-roaster-icon',
-      protected: true
-    },
-    {
-      name: 'Tips',
-      path: '/tips',
-      icon: BookOpen
-    },
-    {
-      name: 'Templates',
-      path: '/templates',
-      icon: Check
-    },
-    {
-      name: 'Progress',
-      path: '/progress',
-      icon: FileText
-    },
-    {
-      name: 'Keywords',
-      path: '/keyword-analyzer',
-      icon: Search
-    },
-    {
-      name: 'Checker',
-      path: '/format-checker',
-      icon: Check
-    },
-    {
-      name: 'Pricing',
-      path: '/pricing',
-      icon: DollarSign
-    }
-  ];
-  
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-  
+  const { signOut } = useClerk();
+  const { isSignedIn, user } = useUser();
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 bg-white border-b z-50 transition-all duration-300 ${
-      scrollPosition > 10 ? 'shadow-md' : 'shadow-sm'
-    }`}>
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+    <nav className="bg-white border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <Logo variant="default" showText={true} />
+            <Link to="/" className="text-2xl font-bold text-gray-800">
+              Lovable
             </Link>
-          </div>
-          
-          {/* Desktop navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-4">
-            <div className="flex items-center space-x-2">
-              {navItems
-                .filter(item => !item.protected || isSignedIn)
-                .map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`relative px-3 py-2 rounded-md text-sm font-medium flex items-center transition-all duration-300 hover:text-primary group ${
-                    isActive(item.path) 
-                      ? 'text-primary' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon 
-                    size={18} 
-                    className={`mr-2 group-hover:scale-110 transition-transform duration-200 ${item.animationClass || ''} ${
-                      isActive(item.path) && item.animationClass ? 'active' : ''
-                    }`} 
-                  />
-                  <span>{item.name}</span>
-                  <span 
-                    className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-amber-500 to-red-600 transition-all duration-300 ${
-                      isActive(item.path) 
-                        ? 'w-full' 
-                        : 'w-0 group-hover:w-full'
-                    }`}
-                  ></span>
-                </Link>
-              ))}
-            </div>
-            
-            {/* Auth actions */}
-            <div className="ml-4">
-              {isSignedIn ? (
-                <UserButton 
-                  afterSignOutUrl="/"
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "w-10 h-10 border-2 border-amber-500"
-                    }
-                  }} 
-                />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <SignInButton mode="modal">
-                    <Button variant="outline" size="sm">
-                      Sign In
-                    </Button>
-                  </SignInButton>
-                  <SignInButton mode="modal">
-                    <Button 
-                      className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700"
-                      size="sm"
-                    >
-                      Get Started
-                    </Button>
-                  </SignInButton>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
-            {isSignedIn && (
-              <div className="mr-4">
-                <UserButton 
-                  afterSignOutUrl="/"
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "w-8 h-8 border-2 border-amber-500"
-                    }
-                  }}
-                />
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
               </div>
-            )}
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none transition-colors duration-200"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <X size={24} className="animate-fade-in" />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="ml-4 flex items-center md:ml-6">
+              {isSignedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.imageUrl} alt={user?.firstName || "Avatar"} />
+                        <AvatarFallback>{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm font-medium leading-none">{user?.firstName} {user?.lastName}</span>
+                        <span className="text-xs leading-none text-muted-foreground">
+                          {user?.emailAddresses[0].emailAddress}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <Menu size={24} className="animate-fade-in" />
+                <>
+                  <Link to="/sign-in">
+                    <Button variant="outline" className="mr-2">Sign In</Button>
+                  </Link>
+                  <Link to="/sign-up">
+                    <Button>Sign Up</Button>
+                  </Link>
+                </>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t animate-fade-in">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {navItems
-              .filter(item => !item.protected || isSignedIn)
-              .map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.path)
-                    ? 'bg-gradient-to-r from-amber-500/10 to-red-600/10 text-primary'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <item.icon size={20} className={`mr-3 ${item.animationClass || ''}`} />
-                {item.name}
-              </Link>
-            ))}
-            
-            {!isSignedIn && (
-              <div className="flex flex-col gap-2 pt-2 mt-2 border-t">
-                <SignInButton mode="modal">
-                  <Button variant="outline" size="sm" className="justify-center">
-                    Sign In
-                  </Button>
-                </SignInButton>
-                <SignInButton mode="modal">
-                  <Button 
-                    className="bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 justify-center"
-                    size="sm"
-                  >
-                    Get Started
-                  </Button>
-                </SignInButton>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </nav>
   );
 };

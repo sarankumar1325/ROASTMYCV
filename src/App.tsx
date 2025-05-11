@@ -18,6 +18,8 @@ import FormatChecker from "./pages/FormatChecker";
 import Templates from "./pages/Templates";
 import Progress from "./pages/Progress";
 import KeywordAnalyzer from "./pages/KeywordAnalyzer";
+import TimelineBuilder from "./pages/TimelineBuilder";
+import PowerWords from "./pages/PowerWords";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,8 @@ const App = () => (
           <Route path="/templates" element={<Templates />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/keyword-analyzer" element={<KeywordAnalyzer />} />
+          <Route path="/timeline-builder" element={<TimelineBuilder />} />
+          <Route path="/power-words" element={<PowerWords />} />
 
           {/* Protected routes */}
           <Route path="/roaster" element={<PrivateRoute element={<Roaster />} />} />
