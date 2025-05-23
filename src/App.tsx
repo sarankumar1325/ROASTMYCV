@@ -20,6 +20,7 @@ import Progress from "./pages/Progress";
 import KeywordAnalyzer from "./pages/KeywordAnalyzer";
 import TimelineBuilder from "./pages/TimelineBuilder";
 import PowerWords from "./pages/PowerWords";
+import TechnicalReport from "./pages/TechnicalReport";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/keyword-analyzer" element={<KeywordAnalyzer />} />
           <Route path="/timeline-builder" element={<TimelineBuilder />} />
           <Route path="/power-words" element={<PowerWords />} />
+          <Route path="/technical-report" element={<TechnicalReport />} />
 
           {/* Protected routes */}
           <Route path="/roaster" element={<PrivateRoute element={<Roaster />} />} />

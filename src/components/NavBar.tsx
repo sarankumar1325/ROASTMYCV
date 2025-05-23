@@ -45,6 +45,7 @@ const NavBar: React.FC = () => {
         { name: "Templates", href: "/templates", description: "Professional resume templates" },
         { name: "Tips Library", href: "/tips", description: "Expert resume writing tips" },
         { name: "Power Words", href: "/power-words", description: "Impact words for your resume" },
+        { name: "Technical Report", href: "/technical-report", description: "Project technical documentation" },
       ]
     },
     {
