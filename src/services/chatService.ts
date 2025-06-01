@@ -21,14 +21,13 @@ export const sendMessage = async (
   messages: Message[]
 ): Promise<string> => {
   try {
-    // Format messages for LangChain using plain objects
-    const langchainMessages = messages.map((msg) => ({
-      role: msg.isUser ? "human" : "ai",
-      content: msg.content
-    }));
+    // Convert messages to a single conversation string for the model
+    const conversationText = messages.map((msg) => 
+      `${msg.isUser ? 'Human' : 'Assistant'}: ${msg.content}`
+    ).join('\n\n');
 
-    // Get response from model
-    const response = await chatModel.invoke(langchainMessages);
+    // Get response from model using string input
+    const response = await chatModel.invoke(conversationText);
 
     return response.content as string;
   } catch (error) {
