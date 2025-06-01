@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -21,6 +20,10 @@ import KeywordAnalyzer from "./pages/KeywordAnalyzer";
 import TimelineBuilder from "./pages/TimelineBuilder";
 import PowerWords from "./pages/PowerWords";
 import TechnicalReport from "./pages/TechnicalReport";
+import ResumeAnalytics from "./pages/ResumeAnalytics";
+import ColorPalettes from "./pages/ColorPalettes";
+import ContactValidator from "./pages/ContactValidator";
+import FontPairing from "./pages/FontPairing";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +57,10 @@ const App = () => (
           <Route path="/timeline-builder" element={<TimelineBuilder />} />
           <Route path="/power-words" element={<PowerWords />} />
           <Route path="/technical-report" element={<TechnicalReport />} />
+          <Route path="/resume-analytics" element={<ResumeAnalytics />} />
+          <Route path="/color-palettes" element={<ColorPalettes />} />
+          <Route path="/contact-validator" element={<ContactValidator />} />
+          <Route path="/font-pairing" element={<FontPairing />} />
 
           {/* Protected routes */}
           <Route path="/roaster" element={<PrivateRoute element={<Roaster />} />} />

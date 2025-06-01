@@ -37,22 +37,26 @@ const NavBar: React.FC = () => {
         { name: "Roast My CV", href: "/roaster", description: "Get AI feedback on your resume" },
         { name: "Format Checker", href: "/format-checker", description: "Verify your resume format" },
         { name: "Keyword Analyzer", href: "/keyword-analyzer", description: "Match resume keywords to job descriptions" },
+        { name: "Resume Analytics", href: "/resume-analytics", description: "Analyze text statistics and readability" },
+        { name: "Contact Validator", href: "/contact-validator", description: "Validate contact information format" },
+      ]
+    },
+    {
+      title: "Design Tools",
+      items: [
+        { name: "Templates", href: "/templates", description: "Professional resume templates" },
+        { name: "Color Palettes", href: "/color-palettes", description: "Professional color schemes" },
+        { name: "Font Pairing", href: "/font-pairing", description: "Typography combinations" },
+        { name: "Power Words", href: "/power-words", description: "Impact words for your resume" },
       ]
     },
     {
       title: "Resources",
       items: [
-        { name: "Templates", href: "/templates", description: "Professional resume templates" },
         { name: "Tips Library", href: "/tips", description: "Expert resume writing tips" },
-        { name: "Power Words", href: "/power-words", description: "Impact words for your resume" },
-        { name: "Technical Report", href: "/technical-report", description: "Project technical documentation" },
-      ]
-    },
-    {
-      title: "Tools",
-      items: [
         { name: "Progress Tracker", href: "/progress", description: "Track your resume improvements" },
         { name: "Timeline Builder", href: "/timeline-builder", description: "Create professional timelines" },
+        { name: "Technical Report", href: "/technical-report", description: "Project technical documentation" },
       ]
     }
   ];
