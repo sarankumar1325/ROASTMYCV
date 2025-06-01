@@ -1,6 +1,5 @@
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 // API Key - in a real application, this should be stored securely
 const API_KEY = "AIzaSyC74WevNjWdIdIhdJ9iG_MCSZbEhBxjrtg";
@@ -22,12 +21,11 @@ export const sendMessage = async (
   messages: Message[]
 ): Promise<string> => {
   try {
-    // Format messages for LangChain using appropriate message classes
-    const langchainMessages = messages.map((msg) => 
-      msg.isUser 
-        ? new HumanMessage(msg.content) 
-        : new AIMessage(msg.content)
-    );
+    // Format messages for LangChain using plain objects
+    const langchainMessages = messages.map((msg) => ({
+      role: msg.isUser ? "human" : "ai",
+      content: msg.content
+    }));
 
     // Get response from model
     const response = await chatModel.invoke(langchainMessages);

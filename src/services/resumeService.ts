@@ -1,6 +1,5 @@
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage } from "@langchain/core/messages";
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Load the PDF.js worker
@@ -46,9 +45,12 @@ export const roastResume = async (file: File): Promise<string> => {
     ${resumeText}
     `;
     
-    // Get response from model
+    // Get response from model using plain message object
     const response = await chatModel.invoke([
-      new HumanMessage(prompt)
+      {
+        role: "human",
+        content: prompt
+      }
     ]);
     
     return response.content as string;
